@@ -13,6 +13,10 @@ namespace EulerSolver.Tools
         {
             Value = _Value;
         }
+        public int DigitCount()
+        {
+            return ToCharArray().Length;
+        }
         public List<int> GetDivisors()
         {
             var result = new List<int>();
