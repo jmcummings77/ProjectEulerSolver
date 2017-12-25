@@ -34,23 +34,17 @@ namespace EulerSolver.Problems
         }
         public override void Solve()
         {
-            List<string> items = new List<string>();
             var previousTerm = new VeryLargeNumber(1);
-            items.Add(previousTerm.ToString());
             var currentTerm = new VeryLargeNumber(1);
-            items.Add(currentTerm.ToString());
-            BigInteger index = 2;
+            int index = 2;
             while(currentTerm.DigitCount() < 1000)
             {
                 BigInteger temp = currentTerm.Value;
                 currentTerm.Value = currentTerm.Value + previousTerm.Value;
-                items.Add(currentTerm.ToString());
                 index++;
                 previousTerm.Value = temp;
-
             }
             Output = index.ToString();
-            //File.WriteAllLines(@"C:\Users\user\Desktop\Fibonacci.txt", items.ToArray());
         }
     }
 }

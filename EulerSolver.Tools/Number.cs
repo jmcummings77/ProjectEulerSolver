@@ -13,6 +13,33 @@ namespace EulerSolver.Tools
         {
             Value = _Value;
         }
+        public List<int> GetPrimeFactors()
+        {
+            Int64 n = Value;
+            var PrimeFactors = new List<int>();
+            PrimeFactors.Add(1);
+            if (n % 2 == 0)
+            {
+                while (n % 2 == 0)
+                {
+                    PrimeFactors.Add(2);
+                    n = n / 2;
+                }
+            }
+
+            for (int i = 3; i <= Math.Sqrt(n); i = i + 2)
+            {
+                if (n % i == 0)
+                {
+                    while (n % i == 0)
+                    {
+                        PrimeFactors.Add(i);
+                        n = n / i;
+                    }
+                }
+            }
+            return PrimeFactors;
+        }
         public List<int> GetProperDivisors()
         {
             var result = new List<int>();
