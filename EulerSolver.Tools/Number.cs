@@ -228,7 +228,23 @@ namespace EulerSolver.Tools
         }
         public bool IsPrime()
         {
-            throw new NotImplementedException();
+            if(Value < 1)
+            {
+                return false;
+            }
+            if(Value < 4)
+            {
+                return true;
+            }
+            var primes = GetPrimeFactors();
+            foreach(int factor in primes)
+            {
+                if (factor != 1 && factor != (int)Value)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
         public string ToWords()
         {

@@ -25,7 +25,29 @@ namespace EulerSolver.Problems
         }
         public override void Solve()
         {
-            
+            int result = 0;
+            int max = 0;
+
+            for(int a = -1000; a < 1001; a++)
+            {
+                for (int b = -1000; b < 1001; b++)
+                {
+                    int n = 0;
+                    while(new Number(n*n + a*n + b).IsPrime())
+                    {
+                        if(n > max)
+                        {
+                            Console.WriteLine(n.ToString());
+                            Console.WriteLine(a.ToString());
+                            Console.WriteLine(b.ToString());
+                            max = n;
+                            result = a * b;
+                        }
+                        n++;
+                    }
+                }
+            }
+            Output = result.ToString();
         }
     }
 }
