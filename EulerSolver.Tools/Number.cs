@@ -26,7 +26,6 @@ namespace EulerSolver.Tools
                     n = n / 2;
                 }
             }
-
             for (int i = 3; i <= Math.Sqrt(n); i = i + 2)
             {
                 if (n % i == 0)
@@ -39,6 +38,16 @@ namespace EulerSolver.Tools
                 }
             }
             return PrimeFactors;
+        }
+        public BigInteger GetSumOfDigitsToNthPower(int N)
+        {
+            BigInteger result = 0;
+            var digits = ToBigIntegerList();
+            foreach(BigInteger digit in digits)
+            {
+                result += BigInteger.Pow(digit, N);
+            }
+            return result;
         }
         public List<int> GetProperDivisors()
         {
@@ -221,7 +230,30 @@ namespace EulerSolver.Tools
         {
             return Value < Int32.MaxValue;
         }
-        
+        public bool IsEven()
+        {
+            return Value % 2 == 0;
+        }
+        public bool IsOdd()
+        {
+            return !IsEven();
+        }
+        public List<Tuple<int, int>> GetFactorPairs()
+        {
+            var factorPairs = new List<Tuple<int, int>>();
+
+            factorPairs.Add(new Tuple<int, int>(1, ToInt()));
+
+            for (int i = 2; i < Math.Sqrt(ToInt()) + 1; i++)
+            {
+                if (ToInt() % i == 0)
+                {
+                    factorPairs.Add(new Tuple<int, int>(i, ToInt()/i));
+                }
+            }
+
+            return factorPairs;
+        }
         public BigInteger ToBigInteger()
         {
             return (Int64)Value;

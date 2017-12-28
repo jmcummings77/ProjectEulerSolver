@@ -1,5 +1,6 @@
 using EulerSolver.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EulerSolver.Problems
 {
@@ -12,6 +13,26 @@ namespace EulerSolver.Problems
         public string Notes { get; set; }    
         public string LogFilePath { get; set; }
         public abstract void Solve();
+        public List<string> LogList { get; set; }
+        public void LogToFile()
+        {
+            if (LogFilePath != "")
+            {
+                if(LogList != null)
+                {
+                    if(LogList.Any())
+                    {
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogFilePath))
+                        {
+                            foreach (string item in LogList)
+                            {
+                                file.WriteLine(item);
+                            }
+                        }
+                    }
+                }
+            }
+        }
         public void LogToFile(string LineToLog)
         {
             if(LogFilePath != "")
@@ -35,7 +56,6 @@ namespace EulerSolver.Problems
                     }
                 }
             }
-
         }
     }
 }
