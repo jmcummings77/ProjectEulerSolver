@@ -95,13 +95,17 @@ namespace EulerSolver.Tools
         }
         public int[] ToIntArray()
         {
-            var values = new List<int>();
-            string value = Value.ToString();
-            for(int i = 0; i < value.Length; i++)
+            var n = Value;
+            if (n == 0)
             {
-                values.Add(int.Parse(value.Substring(i,1)));
+                return new int[1] { 0 };
             }
-            return values.ToArray();
+            var digits = new List<int>();
+            for (; n != 0; n /= 10)
+            {
+                digits.Add((int)n % 10);
+            }
+            return digits.ToArray();
         }
         public List<int> ToIntList()
         {

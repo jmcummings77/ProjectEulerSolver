@@ -21,7 +21,7 @@ namespace EulerSolver.Problems
         public override void Solve()
         {
             LogList = new List<string>();
-            LogFilePath = @"C:\Users\user\Desktop\Problem33a.txt";
+            LogFilePath = @"";
             List<Fraction> results = new List<Fraction>();
             int count = 0;
             for(int i = 1; i < 10; i++)
