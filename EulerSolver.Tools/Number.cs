@@ -435,5 +435,48 @@ namespace EulerSolver.Tools
 
             return tempArray;
         }
+        public string ToBinary()
+        {
+            return Convert.ToString(Convert.ToInt32(ToString(), 10), 2);
+        }
+        public string ToBase2()
+        {
+            return Convert.ToString(Convert.ToInt32(ToString(), 10), 2);
+        }
+        public string ToBase8()
+        {
+            return Convert.ToString(Convert.ToInt32(ToString(), 10), 8);
+        }
+        public string ToBase16()
+        {
+            return Convert.ToString(Convert.ToInt32(ToString(), 10), 16);
+        }
+        public string ToBase10(string NonDecimalNumber, int FromBase)
+        {
+            if (FromBase == 2 || FromBase == 8 || FromBase == 16)
+            {
+                return Convert.ToString(Convert.ToInt32(ToString(), FromBase), 10);
+            }
+            else
+            {
+                throw new NotSupportedException("Base not supported. Only Base 2, 8, and 16 are supported.");
+            }
+        }
+        public bool IsPalindrome(int InBase)
+        {
+            switch(InBase)
+            {
+                case 2:
+                    return ToBase2().SequenceEqual(ToBase2().Reverse());
+                case 8:
+                    return ToBase8().SequenceEqual(ToBase8().Reverse());
+                case 10:
+                    return ToString().SequenceEqual(ToString().Reverse());
+                case 16:
+                    return ToBase16().SequenceEqual(ToBase16().Reverse());
+                default:
+                    throw new NotSupportedException("Base not supported. Only Base 2, 8, and 16 are supported.");
+            }
+        }
     }
 }

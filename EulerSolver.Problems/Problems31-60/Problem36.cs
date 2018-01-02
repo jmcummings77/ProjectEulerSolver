@@ -23,7 +23,17 @@ namespace EulerSolver.Problems
         {
             LogList = new List<string>();
             int result = 0;
-            
+            for(int i = 1; i < 1000000; i++)
+            {
+                var number = new Number(i);
+                if(number.IsPalindrome(10) && number.IsPalindrome(2))
+                {
+                    result += i;
+                    LogList.Add(i.ToString() + " : " + number.ToBase2());
+                }
+            }
+            LogList.Add("Total: " + result.ToString());
+
             LogToFile();
             Output = result.ToString();
         }

@@ -18,10 +18,15 @@ namespace EulerSolver.Problems
         public List<string> LogList { get; set; }
         public void LogToFile()
         {
+            if(LogFilePath == null)
+            {
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                LogFilePath = Path.Combine(path, @"Problem" + Number.ToString() + ".txt");
+            }
             if (LogFilePath == "")
             {
                 string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                string filePath = Path.Combine(path, @"Problem" + Number.ToString() + ".txt");
+                LogFilePath = Path.Combine(path, @"Problem" + Number.ToString() + ".txt");
             }
             if(LogList != null)
             {
@@ -53,10 +58,15 @@ namespace EulerSolver.Problems
         }
         public void LogToFile(string LineToLog)
         {
+            if (LogFilePath == null)
+            {
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                LogFilePath = Path.Combine(path, @"Problem" + Number.ToString() + ".txt");
+            }
             if (LogFilePath == "")
             {
                 string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                string filePath = Path.Combine(path, @"Problem" + Number.ToString() + ".txt");
+                LogFilePath = Path.Combine(path, @"Problem" + Number.ToString() + ".txt");
             }
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogFilePath))
             {
@@ -65,10 +75,15 @@ namespace EulerSolver.Problems
         }
         public void LogToFile<T>(List<T> ListToLog)
         {
+            if (LogFilePath == null)
+            {
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                LogFilePath = Path.Combine(path, @"Problem" + Number.ToString() + ".txt");
+            }
             if (LogFilePath == "")
             {
                 string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                string filePath = Path.Combine(path, @"Problem" + Number.ToString() + ".txt");
+                LogFilePath = Path.Combine(path, @"Problem" + Number.ToString() + ".txt");
             }
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogFilePath))
             {
