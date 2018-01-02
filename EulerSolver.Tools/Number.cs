@@ -157,17 +157,13 @@ namespace EulerSolver.Tools
         }
         public int[] ToIntArray()
         {
-            long n = Value;
-            if (n == 0)
+            var values = new List<int>();
+            string value = Value.ToString();
+            for (int i = 0; i < value.Length; i++)
             {
-                return new int[1] { 0 };
+                values.Add(int.Parse(value.Substring(i, 1)));
             }
-            var digits = new List<int>();
-            for (; n != 0; n /= 10)
-            {
-                digits.Add((int)n % 10);
-            }
-            return digits.ToArray();
+            return values.ToArray();
         }
        
         public List<int> ToIntList()
@@ -359,6 +355,85 @@ namespace EulerSolver.Tools
                 }
             }
             return words;
+        }
+        private static void Swap(ref int a, ref int b)
+        {
+            if (a == b)
+            {
+                return;
+            }
+
+            a ^= b;
+            b ^= a;
+            a ^= b;
+        }
+
+        private void GetPermutations(int[] list)
+        {
+            int x = list.Length - 1;
+            GetPermutations(list, 0, x);
+        }
+        public List<long> Permutations { get; set; }
+        private void GetPermutations(int[] list, int recursionDepth, int maxDepth)
+        {
+            if (recursionDepth == maxDepth)
+            {
+                string result = "";
+                foreach(int i in list)
+                {
+                    result += i.ToString();
+                }
+                Permutations.Add(Int64.Parse(result));
+            }
+            else
+            {
+                for (int i = recursionDepth; i <= maxDepth; i++)
+                {
+                    Swap(ref list[recursionDepth], ref list[i]);
+                    GetPermutations(list, recursionDepth + 1, maxDepth);
+                    Swap(ref list[recursionDepth], ref list[i]);
+                }
+            }
+        }
+        public List<long> GetAllDigitPermutations()
+        {
+            Permutations = new List<long>();
+            GetPermutations(ToIntArray());
+            return Permutations;
+        }
+        public int Length()
+        {
+            return Value.ToString().Length;
+        }
+        public List<long> GetAllRotations()
+        {
+            var result = new List<long>();
+            int length = Length();
+            int[] array = ToIntArray();
+            for (int i = 0; i < length; i++)
+            {
+                string digits = "";
+                for (int j = 0; j < length; j++)
+                {
+                    digits += array[j].ToString();
+                }
+                result.Add(Int64.Parse(digits));
+                array = LeftRotateArray(array);
+            }
+
+
+            return result;
+        }
+        private int[] LeftRotateArray(int[] array)
+        {
+            int[] tempArray = new int[array.Length];
+            tempArray[array.Length - 1] = array[0];
+            for (int i = 0; i < array.Length - 1; i++)
+            {
+                tempArray[i] = array[i + 1];
+            }
+
+            return tempArray;
         }
     }
 }

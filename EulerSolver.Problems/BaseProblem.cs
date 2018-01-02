@@ -1,4 +1,5 @@
 using EulerSolver.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,57 +18,63 @@ namespace EulerSolver.Problems
         public List<string> LogList { get; set; }
         public void LogToFile()
         {
-            if (LogFilePath != "")
+            if (LogFilePath == "")
             {
-                if(LogList != null)
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                string filePath = Path.Combine(path, @"Problem" + Number.ToString() + ".txt");
+            }
+            if(LogList != null)
+            {
+                if(LogList.Any())
                 {
-                    if(LogList.Any())
+                    if (!File.Exists(LogFilePath))
                     {
-                        if (!File.Exists(LogFilePath))
+                        using (System.IO.StreamWriter file = File.CreateText(LogFilePath))
                         {
-                            using (System.IO.StreamWriter file = File.CreateText(LogFilePath))
+                            foreach (string item in LogList)
                             {
-                                foreach (string item in LogList)
-                                {
-                                    file.WriteLine(item);
-                                }
+                                file.WriteLine(item);
                             }
                         }
-                        else
+                    }
+                    else
+                    {
+                        using (System.IO.StreamWriter file = File.AppendText(LogFilePath))
                         {
-                            using (System.IO.StreamWriter file = File.AppendText(LogFilePath))
+                            foreach (string item in LogList)
                             {
-                                foreach (string item in LogList)
-                                {
-                                    file.WriteLine(item);
-                                }
+                                file.WriteLine(item);
                             }
                         }
                     }
                 }
             }
+            
         }
         public void LogToFile(string LineToLog)
         {
-            if(LogFilePath != "")
+            if (LogFilePath == "")
             {
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogFilePath))
-                {
-                  file.WriteLine(LineToLog);
-                }
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                string filePath = Path.Combine(path, @"Problem" + Number.ToString() + ".txt");
             }
-
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogFilePath))
+            {
+                file.WriteLine(LineToLog);
+            }
         }
         public void LogToFile<T>(List<T> ListToLog)
         {
-            if (LogFilePath != "")
+            if (LogFilePath == "")
             {
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogFilePath))
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                string filePath = Path.Combine(path, @"Problem" + Number.ToString() + ".txt");
+            }
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogFilePath))
+            {
+                foreach(var item in ListToLog)
                 {
-                    foreach(var item in ListToLog)
-                    {
-                        file.WriteLine(item.ToString());
-                    }
+                    file.WriteLine(item.ToString());
                 }
             }
         }
