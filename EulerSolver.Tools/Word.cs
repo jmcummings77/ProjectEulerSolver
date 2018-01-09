@@ -9,15 +9,17 @@ namespace EulerSolver.Tools
 {
     public class Word
     {
-        public string Value { get; set; }
+        public string Value { get; private set; }
         public Word(string _Value)
         {
             Value = _Value;
+            Length = _Value.Length;
         }
         public BigInteger GetSimpleAlphabetScore()
         {
             return GetCharacterScore(GetAlphabetScoreDictionary(), "[^a-zA-Z -]", false);
         }
+        public int Length { get; private set; }
         public string Clean(string InvalidCharacterRegEx)
         {
             Regex regx = new Regex(InvalidCharacterRegEx);

@@ -20,7 +20,46 @@ namespace EulerSolver.Problems
         }
         public override void Solve()
         {
-           
+            long result = GetHighestPandigitalPrime();
+            Output = result.ToString();
+        }
+        public long GetHighestPandigitalPrime()
+        {
+            List<int> digits = new List<int>();
+            for(int i = 9; i > 0; i--)
+            {
+                digits.Add(i);
+            }
+            for(int i = 9; i > 0; i--)
+            {
+                long result = GetHighestPandigitalPrimeInDigitSet(digits);
+                if (result != 0)
+                {
+                    return result;
+                }
+                digits.Remove(i);
+            }
+            return 0;
+        }
+        public long GetHighestPandigitalPrimeInDigitSet(List<int> Digits)
+        {
+            string digitList = "";
+            Digits = Digits.OrderByDescending(x => x).ToList();
+            foreach (int digit in Digits)
+            {
+                digitList += digit.ToString();
+            }
+            var digits = new Number(int.Parse(digitList));
+            List<long> permutations = digits.GetAllDigitPermutations();
+            foreach(long permutation in permutations)
+            {
+                var number = new Number(permutation);
+                if (number.IsPrime())
+                {
+                    return permutation;
+                }
+            }
+            return 0;
         }
     }
 }

@@ -478,5 +478,33 @@ namespace EulerSolver.Tools
                     throw new NotSupportedException("Base not supported. Only Base 2, 8, and 16 are supported.");
             }
         }
+        public bool IsPanDigital()
+        {
+            int length = Length();
+            if(length > 9)
+            {
+                return false;
+            }
+            List<int> digits = ToIntList();
+            if(digits.Distinct().Count() != digits.Count())
+            {
+                return false;
+            }
+            for(int i = 1; i <= length; i++)
+            {
+                if(!digits.Contains(i))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public bool IsTriangleNumber()
+        {
+            bool result = true;
+
+
+            return result;
+        }
     }
 }
