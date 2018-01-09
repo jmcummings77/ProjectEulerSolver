@@ -232,6 +232,7 @@ namespace EulerSolver.Experiments
             }
 
         }
+        
         private static async Task SaveResultAsync(FactorialResult factorialResult)
         {
             using (var EulerContext = new EulerSolverDataContext())

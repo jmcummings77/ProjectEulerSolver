@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using EulerSolver.Problems;
 
@@ -9,7 +10,7 @@ namespace EulerSolver.Core
     {
         static void Main(string[] args)
         {
-            var problem = new Problem39();
+            var problem = new Problem40();
             problem.Solve();
             Console.WriteLine(problem.Output);
             Console.ReadLine();
