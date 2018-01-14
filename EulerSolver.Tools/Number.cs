@@ -501,10 +501,17 @@ namespace EulerSolver.Tools
         }
         public bool IsTriangleNumber()
         {
-            bool result = true;
-
-
-            return result;
+            double root = Math.Sqrt(8 * Value + 1);
+            return IsNatural(root);
+        }
+        public bool IsPentagonNumber()
+        {
+            double n = (1 + Math.Sqrt(24 * Value + 1)) / 6;
+            return IsNatural(n);
+        }
+        private bool IsNatural(double X)
+        {
+            return (Math.Floor(X) == X);
         }
     }
 }
