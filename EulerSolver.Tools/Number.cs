@@ -17,7 +17,6 @@ namespace EulerSolver.Tools
         {
             Int64 n = Value;
             var PrimeFactors = new List<int>();
-            PrimeFactors.Add(1);
             if (n % 2 == 0)
             {
                 while (n % 2 == 0)
@@ -36,6 +35,10 @@ namespace EulerSolver.Tools
                         n = n / i;
                     }
                 }
+            }
+            if(n > 2)
+            {
+                PrimeFactors.Add(n);
             }
             return PrimeFactors;
         }
@@ -512,6 +515,35 @@ namespace EulerSolver.Tools
         private bool IsNatural(double X)
         {
             return (Math.Floor(X) == X);
+        }
+        public int GetDistinctPrimeFactorsCount()
+        {
+            long n = Value;
+            int result = 0;
+            if (n % 2 == 0)
+            {
+                result++;
+                while (n % 2 == 0)
+                {
+                    n = n / 2;
+                }
+            }
+            for (int i = 3; i <= Math.Sqrt(n); i = i + 2)
+            {
+                if (n % i == 0)
+                {
+                    result++;
+                    while (n % i == 0)
+                    {
+                        n = n / i;
+                    }
+                }
+            }
+            if (n > 2)
+            {
+                result++;
+            }
+            return result;
         }
     }
 }
