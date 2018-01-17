@@ -38,7 +38,7 @@ namespace EulerSolver.Tools
             }
             if(n > 2)
             {
-                PrimeFactors.Add(n);
+                PrimeFactors.Add((int)n);
             }
             return PrimeFactors;
         }

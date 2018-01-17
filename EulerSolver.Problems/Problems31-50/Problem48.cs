@@ -20,7 +20,12 @@ namespace EulerSolver.Problems
         }
         public override void Solve()
         {
-
+            BigInteger total = 0;
+            for(int i = 1; i < 1001; i++)
+            {
+                total += BigInteger.Pow(i, i);
+            }
+            Output = total.ToString().Substring(total.ToString().Length - 10);
         }
     }
 }
