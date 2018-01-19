@@ -76,8 +76,8 @@ namespace EulerSolver.Problems
                 }
             }
             LogToFile();
-            long numerator = 1;
-            long denominator = 1;
+            BigInteger numerator = 1;
+            BigInteger denominator = 1;
             count = 0;
             foreach (Fraction fraction in results)
             {

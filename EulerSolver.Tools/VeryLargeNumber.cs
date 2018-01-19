@@ -66,7 +66,7 @@ namespace EulerSolver.Tools
         {
             var result = new BigInteger();
             result = 0;
-            var digits = ToIntArray();
+            var digits = ToIntList();
             foreach(int i in digits)
             {
                 result += i;

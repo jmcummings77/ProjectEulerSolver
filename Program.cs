@@ -10,7 +10,7 @@ namespace EulerSolver.Core
     {
         static void Main(string[] args)
         {
-            var problem = new Problem50();
+            var problem = new Problem57();
             problem.Solve();
             Console.WriteLine(problem.Output);
             Console.ReadLine();

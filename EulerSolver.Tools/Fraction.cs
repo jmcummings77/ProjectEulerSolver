@@ -8,21 +8,66 @@ namespace EulerSolver.Tools
 {
     public class Fraction
     {
-        public long Numerator { get; private set; }
-        public long Denominator { get; private set; }
-        public long ReducedNumerator { get; private set; }
-        public long ReducedDenominator { get; private set; }
-        public long GreatestCommonDivisor { get; private set; }
+        public BigInteger Numerator { get; private set; }
+        public BigInteger Denominator { get; private set; }
+        public BigInteger ReducedNumerator { get; private set; }
+        public BigInteger ReducedDenominator { get; private set; }
+        public BigInteger GreatestCommonDivisor { get; private set; }
 
-        public Fraction(object numerator, object denominator)
+        public Fraction(BigInteger numerator, BigInteger denominator)
         {
-            Numerator = (long)numerator;
-            Denominator = (long)denominator;
+            Numerator = numerator;
+            Denominator = denominator;
             if (Denominator == 0)
             {
                 throw new DivideByZeroException();
             }
             Simplify();
+        }
+        public void Add(Fraction fraction)
+        {
+            if(fraction.Denominator == Denominator)
+            {
+                Numerator += fraction.Numerator;
+            }
+            else
+            {
+                Numerator = (Numerator * fraction.Denominator) + (fraction.Numerator * Denominator);
+                Denominator = Denominator * fraction.Denominator;
+            }
+            if (Denominator == 0)
+            {
+                throw new DivideByZeroException();
+            }
+            Simplify();
+        }
+        public void Multiply(Fraction fraction)
+        {
+            Numerator = Numerator * fraction.Numerator;
+            Denominator = Denominator * fraction.Denominator;
+            if (Denominator == 0)
+            {
+                throw new DivideByZeroException();
+            }
+            Simplify();
+        }
+        public void DivideBy(Fraction fraction)
+        {
+            Numerator = Numerator * fraction.Denominator;
+            Denominator = Denominator * fraction.Numerator;
+            if (Denominator == 0)
+            {
+                throw new DivideByZeroException();
+            }
+            Simplify();
+        }
+        public long GetNumeratorDigitCount()
+        {
+            return Numerator.ToString().Length;
+        }
+        public long GetDenominatorDigitCount()
+        {
+            return Denominator.ToString().Length;
         }
         public void Simplify()
         {
@@ -40,8 +85,8 @@ namespace EulerSolver.Tools
         }
         private void SetGreatestCommonDivisor()
         {
-            long a = Numerator;
-            long b = Denominator;
+            BigInteger a = Numerator;
+            BigInteger b = Denominator;
             while (a != b)
             {
                 if (a < b)
@@ -55,10 +100,10 @@ namespace EulerSolver.Tools
             }
             GreatestCommonDivisor = a;
         }
-        private long WholeDivision(long a, long b)
+        private BigInteger WholeDivision(BigInteger a, BigInteger b)
         {
-            long remainder = a;
-            long quotient = 0;
+            BigInteger remainder = a;
+            BigInteger quotient = 0;
             while (remainder >= b)
             {
                 remainder = remainder - b;
