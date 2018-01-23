@@ -504,13 +504,32 @@ namespace EulerSolver.Tools
         }
         public bool IsTriangleNumber()
         {
-            double root = Math.Sqrt(8 * Value + 1);
-            return IsNatural(root);
+            double n = Math.Sqrt(8 * Value + 1);
+            return (Math.Floor(n) == n);
         }
         public bool IsPentagonNumber()
         {
             double n = (1 + Math.Sqrt(24 * Value + 1)) / 6;
-            return IsNatural(n);
+            return (Math.Floor(n) == n);
+        }
+        public bool IsHexagonNumber()
+        {
+            double n = (1 + Math.Sqrt(8 * Value + 1)) / 4;
+            return (Math.Floor(n) == n);
+        }
+        public bool IsHeptagonNumber()
+        {
+            double n = (3 - Math.Sqrt(40 * Value + 9)) / 10;
+            return (Math.Floor(n) == n);
+        }
+        public bool IsOctagonNumber()
+        {
+            double n = (1 - Math.Sqrt(3 * Value + 1)) / 3;
+            return (Math.Floor(n) == n);
+        }
+        public bool IsPerfectSquare()
+        {
+            return (Math.Floor(Math.Sqrt(Value)) == Math.Sqrt(Value));
         }
         private bool IsNatural(double X)
         {
@@ -544,6 +563,42 @@ namespace EulerSolver.Tools
                 result++;
             }
             return result;
+        }
+        public bool IsPotentiallyCubic()
+        {
+            switch (GetDigitalRoot())
+            {
+                case 1:
+                    return true;
+                case 8:
+                    return true;
+                case 9:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        public int GetDigitalRoot()
+        {
+            List<int> digits = new List<int>();
+            foreach (char digit in Value.ToString().ToCharArray())
+            {
+                digits.Add(int.Parse(digit.ToString()));
+            }
+            while (digits.Count() > 1)
+            {
+                digits = GetSumOfDigits(digits);
+            }
+            return digits.Sum();
+        }
+        private static List<int> GetSumOfDigits(List<int> digits)
+        {
+            long sum = digits.Sum();
+            foreach (char digit in sum.ToString().ToCharArray())
+            {
+                digits.Add(int.Parse(digit.ToString()));
+            }
+            return digits;
         }
     }
 }

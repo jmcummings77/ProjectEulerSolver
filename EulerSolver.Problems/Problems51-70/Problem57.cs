@@ -37,7 +37,6 @@ namespace EulerSolver.Problems
                 currentTerm.Add(modifier);
                 divisee.DivideBy(currentTerm);
                 currentTerm = divisee;
-                Console.WriteLine(currentTerm.Numerator.ToString() + " / " + currentTerm.Denominator.ToString());
                 var resultTerm = new Fraction((BigInteger)1, (BigInteger)1);
                 resultTerm.Add(currentTerm);
                 if (resultTerm.GetDenominatorDigitCount() < resultTerm.GetNumeratorDigitCount())

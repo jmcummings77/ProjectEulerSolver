@@ -29,7 +29,71 @@ namespace EulerSolver.Problems
         public override void Solve()
         {
             LogList = new List<string>();
+            long result = 1;
+            decimal primeRatio = 1;
+            int primeCount = 0;
+            int diagonalsCount = 1;
+            int sides = 1;
+            int i = 1;
+            while (primeRatio > (decimal)0.1)
+            {
+                sides += 2;
+                diagonalsCount += 4;
+                result = result + (2 * i);
+                if (IsPrime(result))
+                {
+                    primeCount++;
+                }
+                result = result + (2 * i);
+                if (IsPrime(result))
+                {
+                    primeCount++;
+                }
+                result = result + (2 * i);
+                if (IsPrime(result))
+                {
+                    primeCount++;
+                }
+                result = result + (2 * i);
+                if (IsPrime(result))
+                {
+                    primeCount++;
+                }
+                primeRatio = (decimal)primeCount / (decimal)diagonalsCount;
+                i++;
+                Console.WriteLine("Sides : " + sides.ToString() + " Prime Count : " + primeCount.ToString() + " Diagonals Count : " + diagonalsCount.ToString() + " Prime Ratio : " + primeRatio.ToString());
+                LogList.Add(i.ToString() + "," + sides.ToString() + "," + primeCount.ToString() + "," + diagonalsCount.ToString() + "," + primeRatio.ToString());
+                LogToFile();
+                LogList.Clear();
 
+            }
+            Output = sides.ToString();
         }
+        private static bool IsPrime(long Value)
+        {
+            if (Value < 1)
+            {
+                return false;
+            }
+            if (Value < 4)
+            {
+                return true;
+            }
+            if (Value % 2 == 0)
+            {
+                {
+                    return false;
+                }
+            }
+            for (int i = 3; i <= Math.Sqrt(Value); i = i + 2)
+            {
+                if (Value % i == 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
     }
 }
