@@ -25,5 +25,7 @@ namespace EulerSolver.Problems
             LogList = new List<string>();
 
         }
+
+        
     }
 }

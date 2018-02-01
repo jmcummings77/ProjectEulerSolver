@@ -13,6 +13,7 @@ namespace EulerSolver.Tools
         public BigInteger ReducedNumerator { get; private set; }
         public BigInteger ReducedDenominator { get; private set; }
         public BigInteger GreatestCommonDivisor { get; private set; }
+        public double ApproximateValue { get; private set; }
 
         public Fraction(BigInteger numerator, BigInteger denominator)
         {
@@ -23,6 +24,7 @@ namespace EulerSolver.Tools
                 throw new DivideByZeroException();
             }
             Simplify();
+            ApproximateValue = (double)numerator / (double)denominator;
         }
         public void Add(Fraction fraction)
         {
@@ -112,4 +114,62 @@ namespace EulerSolver.Tools
             return quotient;
         }
     }
+    public class SmallFraction
+    {
+        public int Numerator { get; private set; }
+        public int Denominator { get; private set; }
+        public double ApproximateValue { get; private set; }
+
+        public SmallFraction(int numerator, int denominator)
+        {
+            Numerator = numerator;
+            Denominator = denominator;
+            if (Denominator == 0)
+            {
+                throw new DivideByZeroException();
+            }
+            Simplify();
+            ApproximateValue = (double)numerator / (double)denominator;
+        }
+        public void Simplify()
+        {
+            int GreatestCommonDivisor = GetGreatestCommonDivisor();
+            if (GreatestCommonDivisor != 1)
+            {
+                Numerator = WholeDivision(Numerator, GreatestCommonDivisor);
+                Denominator = WholeDivision(Denominator, GreatestCommonDivisor);
+            }
+             
+
+        }
+        private int GetGreatestCommonDivisor()
+        {
+            int a = Numerator;
+            int b = Denominator;
+            while (a != b)
+            {
+                if (a < b)
+                {
+                    b = b - a;
+                }
+                else
+                {
+                    a = a - b;
+                }
+            }
+            return a;
+        }
+        private int WholeDivision(int a, int b)
+        {
+            int remainder = a;
+            int quotient = 0;
+            while (remainder >= b)
+            {
+                remainder = remainder - b;
+                quotient++;
+            }
+            return quotient;
+        }
+    }
+
 }

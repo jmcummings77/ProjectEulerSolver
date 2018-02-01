@@ -17,19 +17,23 @@ namespace EulerSolver.Problems
             Number = 63;
             Prompt = "The 5-digit number, 16807=75, is also a fifth power. Similarly, the 9-digit number, 134217728=89, is a ninth power. " +
                      "How many n-digit positive integers exist which are also an nth power?";
+            ///This is a bad solution but it works
+            ///Too many magic numbers. I know that the series diverges above base 10 and power 10, but I don't know why so I brute forced it
         }
         public override void Solve()
         {
             LogList = new List<string>();
-            int iterationsWithoutMatch = 0;
-            int currentInteger = 1;
-            int matchCount = 0;
+            int outsideIterationsWithoutMatch = 0;
 
-            while (iterationsWithoutMatch < 10000)
+            int currentInteger = 2;
+            int matchCount = 1;
+            
+            while (outsideIterationsWithoutMatch < 100)
             {
                 int currentPower = 1;
                 int powerLength = 0;
-                while(powerLength <= currentPower)
+                int insideIterationsWithoutMatch = 0;
+                while (insideIterationsWithoutMatch < 100)
                 {
                     var power = BigInteger.Pow(currentInteger, currentPower);
                     powerLength = power.ToString().Length;
@@ -38,17 +42,19 @@ namespace EulerSolver.Problems
                         matchCount++;
                         Console.WriteLine(matchCount.ToString());
                         Console.WriteLine("Current Base : " + currentInteger.ToString() + " Power : " + currentPower.ToString() + " Length : " + powerLength.ToString() + " Result : " + power.ToString());
-                        iterationsWithoutMatch = 0;
+                        insideIterationsWithoutMatch = 0;
                     }
                     else
                     {
-                        iterationsWithoutMatch++;
-                        Console.WriteLine("No match : " + iterationsWithoutMatch.ToString());
+                        insideIterationsWithoutMatch++;
+                        Console.WriteLine("No match : " + currentInteger.ToString() + " ^ " + currentPower.ToString());
                     }
                     currentPower++;
                 }
+                outsideIterationsWithoutMatch++;
                 currentInteger++;
             }
+            Output = matchCount.ToString();
         }
         public BigInteger GetValueToDigitLengthPower(int Value)
         {

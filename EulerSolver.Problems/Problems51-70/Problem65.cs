@@ -21,7 +21,20 @@ namespace EulerSolver.Problems
         public override void Solve()
         {
             LogList = new List<string>();
+            int upperBound = 101;
+            BigInteger denominator = 1;
+            BigInteger numerator = 2;
 
+            for (int i = 2; i < upperBound; i++)
+            {
+                BigInteger currentDenominator = denominator;
+                int n = (i % 3 == 0) ? 2 * (i / 3) : 1;
+                denominator = numerator;
+                numerator = n * denominator + currentDenominator;
+            }
+           
+            int result = numerator.ToString().ToCharArray().Select(x => int.Parse(x.ToString())).Sum();
+            Output = result.ToString();
         }
     }
 }

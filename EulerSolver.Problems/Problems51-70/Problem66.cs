@@ -31,7 +31,55 @@ namespace EulerSolver.Problems
         public override void Solve()
         {
             LogList = new List<string>();
+            BigInteger result = 0;
+            int resultD = 0;
+            for(int i = 2; i < 1001; i++)
+            {
+                if (!IsPerfectSquare(i))
+                {
+                    BigInteger evaluatedResult = GetMinimalX(i);
+                    if (evaluatedResult > result)
+                    {
+                        result = evaluatedResult;
+                        resultD = i;
+                    }
+                }
+            }
+            Output = resultD.ToString();
+        }
+        public BigInteger GetMinimalX(int D)
+        {
+            BigInteger startingDigit = (BigInteger)Math.Floor(Math.Sqrt((double)D));
+            BigInteger denominator = 1;
+            BigInteger modifier = 0;
 
+            BigInteger numeratorMod = 1;
+            BigInteger denominatorMod = 0;
+            BigInteger denominatorMod2 = 1;
+
+
+            BigInteger adjustment = startingDigit;
+            BigInteger numerator = startingDigit; 
+            while((numerator * numerator) - (denominatorMod2 * denominatorMod2 * D) != 1)
+            {
+                modifier = (denominator * adjustment - modifier);
+                denominator = ((D - modifier * modifier) / denominator);
+                adjustment = ((startingDigit + modifier) / denominator);
+
+                BigInteger tempNumerator = numeratorMod;
+                numeratorMod = numerator;
+                BigInteger tempDenominator = denominatorMod;
+                denominatorMod = denominatorMod2;
+
+                numerator = adjustment * numeratorMod + tempNumerator;
+                denominatorMod2 = adjustment * denominatorMod + tempDenominator;
+            }
+
+            return numerator;
+        }
+        private static bool IsPerfectSquare(int Value)
+        {
+            return (Math.Floor(Math.Sqrt(Value)) == Math.Sqrt(Value));
         }
     }
 }

@@ -10,38 +10,112 @@ using System.Threading.Tasks;
 
 namespace EulerSolver.Problems
 {
-    public class Problem69 : BaseProblem, IProblem
+    public class Problem72 : BaseProblem, IProblem
     {
-        public Problem69()
+        public Problem72()
         {
-            Number = 69;
-            Prompt = "https://projecteuler.net/problem=69"
-                   + "   Find the value of n ≤ 1,000,000 for which n/φ(n) is a maximum.";
+            Number = 72;
+            Prompt = "Consider the fraction, n/d, where n and d are positive integers. If n<d and HCF(n,d)=1, it is called a reduced proper fraction. " +
+                    "If we list the set of reduced proper fractions for d ≤ 8 in ascending order of size, we get: " +
+                    "       1/8, 1/7, 1/6, 1/5, 1/4, 2/7, 1/3, 3/8, 2/5, 3/7, 1/2, 4/7, 3/5, 5/8, 2/3, 5/7, 3/4, 4/5, 5/6, 6/7, 7/8 " +
+                    "It can be seen that there are 21 elements in this set. " +
+                    "How many elements would be contained in the set of reduced proper fractions for d ≤ 1,000,000?";
         }
         public override void Solve()
         {
-            int limit = 1000001;
-            var primes = new List<int>();
-            for (int i = 1; i < limit; i++)
+            int limit = 1000000;
+            int[] phi = Enumerable.Range(0, limit + 1).ToArray();
+            long result = 0;
+            for (int i = 2; i <= limit; i++)
             {
-                if(IsPrime(i))
+                if (phi[i] == i)
                 {
-                    primes.Add(i);
+                    for (int j = i; j <= limit; j += i)
+                    {
+                        phi[j] = phi[j] / i * (i - 1);
+                    }
                 }
-            }
-            int result = 1;
-            int j = 0;
-            while(result * primes[j] < limit)
-            {
-                result *= primes[j];
-                j++;
+                result += phi[i];
+
             }
             Output = result.ToString();
+                
         }
-
-        private void GetResult()
+        public void test()
         { 
-            LogList = new List<string>();
+            int limit = 1000001;
+            BigInteger n = 13;
+            var primes = new List<int>();
+            primes.Add(1);
+            primes.Add(2);
+            primes.Add(3);
+            primes.Add(5);
+            primes.Add(7);
+
+
+            var nonPrimeOdds = new List<int>();
+            var evens = new List<int>();
+            evens.Add(4);
+            evens.Add(6);
+            evens.Add(8);
+
+            nonPrimeOdds.Add(9);
+
+            for (int i = 11; i < limit; i+=2)
+            {
+                evens.Add(i - 1);
+                n += primes.Count();
+
+                if (IsPrime(i))
+                {
+                    primes.Add(i);
+                    n += i - 1;
+                }
+                else
+                {
+                    n += primes.Count();
+                    foreach(int odd in nonPrimeOdds)
+                    {
+                        if (GetGreatestCommonDivisor(i, odd) == 1)
+                        {
+                            n++;
+                        }
+                    }
+                    foreach (int even in evens)
+                    {
+                        if (GetGreatestCommonDivisor(i, even) == 1)
+                        {
+                            n++;
+                        }
+                    }
+                    nonPrimeOdds.Add(i);
+                }
+            }
+            for (int i = 4; i < limit; i+=2)
+            {
+                if(!primes.Contains(i))
+                {
+                    n++;
+                    for(int j = i - 1; j > 1; j--)
+                    {
+                        if(primes.Contains(j))
+                        {
+                            n++;
+                        }
+                        else
+                        {
+                            if (GetGreatestCommonDivisor(i, j) == 1)
+                            {
+                                n++;
+                            }
+                        }
+                    }
+                }
+            }
+            Output = n.ToString();
+        }
+        private void GetResult()
+        {
             double max = 0;
             int result = 0;
             List<int> primes = new List<int>();
@@ -49,7 +123,7 @@ namespace EulerSolver.Problems
             primes.Add(2);
             List<int> nonPrimeOdds = new List<int>();
 
-            for (int i = 4; i < 1000000; i+=2)
+            for (int i = 4; i < 1000000; i += 2)
             {
                 int n = primes.Count();
                 if (IsPrime(i - 1))
@@ -61,14 +135,14 @@ namespace EulerSolver.Problems
                 {
                     nonPrimeOdds.Add(i - 1);
                 }
-                foreach(int odd in nonPrimeOdds)
+                foreach (int odd in nonPrimeOdds)
                 {
                     if (GetGreatestCommonDivisor(i, odd) == 1)
                     {
                         n++;
                     }
                 }
-                
+
                 double phi = (double)i / (double)n;
                 if (phi > max)
                 {
@@ -141,6 +215,5 @@ namespace EulerSolver.Problems
                 return b;
             }
         }
-
     }
 }
