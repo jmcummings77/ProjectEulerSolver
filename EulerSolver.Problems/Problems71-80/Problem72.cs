@@ -23,19 +23,31 @@ namespace EulerSolver.Problems
         }
         public override void Solve()
         {
-            int limit = 1000000;
-            int[] phi = Enumerable.Range(0, limit + 1).ToArray();
+            int limit = 1000001;
+            // I tried doing this with some overly complicated ways of calculating phiN efficeintly for odds, evens, primes, etc. 
+            // Those solutions took insanely long
+            // So I went back to the totient formula and realized I just need to count integers once the 
+            // prime factors have been removed
+            
+            // create an array with all of the positive integers below the limit
+
+            int[] numbers = Enumerable.Range(0, limit).ToArray();
             long result = 0;
-            for (int i = 2; i <= limit; i++)
+            // loop through the array, stopping only at numbers that are the same as their index, 
+            // i.e. numbers that are prime, because any lesser prime factors should have been removed
+            // remove that prime factor from any subsequent integer
+            // add the reduced integers to the total
+            for (int i = 2; i < limit; i++)
             {
-                if (phi[i] == i)
+                if (numbers[i] == i)
                 {
-                    for (int j = i; j <= limit; j += i)
+                    int divisor = i * (i - 1);
+                    for (int j = i; j < limit; j += i)
                     {
-                        phi[j] = phi[j] / i * (i - 1);
+                        numbers[j] = numbers[j] / divisor;
                     }
                 }
-                result += phi[i];
+                result += numbers[i];
 
             }
             Output = result.ToString();

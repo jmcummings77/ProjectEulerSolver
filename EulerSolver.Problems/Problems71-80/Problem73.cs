@@ -15,29 +15,69 @@ namespace EulerSolver.Problems
         public Problem73()
         {
             Number = 73;
-            Prompt = "";
+            Prompt = "Consider the fraction, n/d, where n and d are positive integers. If n<d and HCF(n,d)=1, it is called a reduced proper fraction. " +
+                     "If we list the set of reduced proper fractions for d ≤ 8 in ascending order of size, we get: " +
+                     "       1/8, 1/7, 1/6, 1/5, 1/4, 2/7, 1/3, 3/8, 2/5, 3/7, 1/2, 4/7, 3/5, 5/8, 2/3, 5/7, 3/4, 4/5, 5/6, 6/7, 7/8 " +
+                     "It can be seen that there are 3 fractions between 1/3 and 1/2. " +
+                     "How many fractions lie between 1/3 and 1/2 in the sorted set of reduced proper fractions for d ≤ 12,000?";
         }
         public override void Solve()
         {
-            LogList = new List<string>();
-            decimal rightRatio = (decimal)1.0 / (decimal)2.0;
-            decimal leftRatio = (decimal)1.0 / (decimal)3.0;
-            long fractionCount = 0;
+            int minimumDenominator = 3;
+            int maximumDenoninator = 2;
+            int limit = 12001;
+            long result = 0;
 
-            for (int i = 1; i < 12001; i++)
+            for (int i = 1; i < limit; i++)
             {
-                int max = (int)Math.Ceiling(((double)1.0 * (double)i) / (double)2.0);
-                int min = (int)Math.Floor(((double)1.0 * (double)i) / (double)3.0);
+                int max = ((i - 1) / maximumDenoninator) + 1;
+                int min = (i / minimumDenominator) + 1;
                 for (int j = min; j < max; j++)
                 {
-                    decimal ratio = (decimal)j / (decimal)i;
-                    if (ratio > leftRatio && ratio < rightRatio)
+                    if (GetGreatestCommonDivisor(i,j) == 1)
                     {
-                        fractionCount++;
+                        result++;
                     }
                 }
             }
-            Output = fractionCount.ToString();
+            Output = result.ToString();
         }
+        private static int GetGreatestCommonDivisor(int a, int b)
+        {
+            if (a < b)
+            {
+                int temp = a;
+                a = b;
+                b = temp;
+            }
+            int remainder;
+            int priorRemainder;
+            int nextRemainder;
+            int quotient = Math.DivRem(a, b, out priorRemainder);
+            if (priorRemainder != 0)
+            {
+                quotient = Math.DivRem(b, priorRemainder, out remainder);
+                if (remainder != 0)
+                {
+                    nextRemainder = remainder;
+                    while (remainder != 0)
+                    {
+                        quotient = Math.DivRem(priorRemainder, nextRemainder, out remainder);
+                        priorRemainder = nextRemainder;
+                        nextRemainder = remainder;
+                    }
+                    return priorRemainder;
+                }
+                else
+                {
+                    return priorRemainder;
+                }
+            }
+            else
+            {
+                return b;
+            }
+        }
+
     }
 }
