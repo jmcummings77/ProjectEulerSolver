@@ -27,15 +27,18 @@ namespace EulerSolver.Problems
         }
         public override void Solve()
         {
-            List<BigInteger> results = new List<BigInteger>();
-            for(BigInteger a = 2; a < 101; a++)
+            LogList = new List<string>();
+            int limit = 10000;
+            HashSet<BigInteger> results = new HashSet<BigInteger>();
+            for(BigInteger a = 2; a <= limit; a++)
             {
-                for(BigInteger b = 2; b < 101; b++)
+                for(BigInteger b = 2; b <= limit; b++)
                 {
-                    results.Add(BigInteger.Pow(a, (int)b));
+                    BigInteger x = BigInteger.Pow(a, (int)b);
+                    results.Add(x);
                 }
             }
-            Output = results.Distinct().ToList().Count().ToString();
+            Output = results.Count().ToString();
         }
     }
 }

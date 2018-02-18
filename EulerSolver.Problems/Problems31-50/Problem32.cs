@@ -20,38 +20,93 @@ namespace EulerSolver.Problems
         }
         public override void Solve()
         {
-            List<int> results = new List<int>();
-            LogList = new List<string>();
-            for(int i = 1; i < 1000000; i++)
+            for (int pandigitalCount = 4; pandigitalCount < 10; pandigitalCount++)
             {
-                var number = new Number(i);
-                var digitList = i.ToString().ToCharArray();
-                if(digitList.Distinct().Count() == digitList.Count())
+                HashSet<int> results = new HashSet<int>();
+                var excludedDigits = GetExcludedDigits(pandigitalCount);
+                LogList = new List<string>();
+                for (int i = 1; i < 7853; i++)
                 {
-                    if (i.ToString().Contains("0"))
+                    var digitList = i.ToString().ToCharArray();
+                    if (digitList.Distinct().Count() == digitList.Count())
                     {
-                    }
-                    else
-                    { 
-                        var factorPairs = number.GetFactorPairs();
-                        foreach(Tuple<int, int> pair in factorPairs)
+                        if (!HasExcludedDigits(i.ToString(), excludedDigits))
                         {
-                            string fullList = pair.Item1.ToString() + pair.Item2.ToString() + i.ToString();
-                            if(fullList.Length == 9 && !fullList.Contains("0"))
+                            var factorPairs = GetFactorPairs(i, excludedDigits);
+                            foreach (Tuple<int, int> pair in factorPairs)
                             {
-                                if(fullList.ToCharArray().Distinct().Count() == 9)
+                                if(i == 54321)
                                 {
-                                    results.Add(i);
-                                    LogList.Add("Number: " + i.ToString() + " Factors: [" + pair.Item1.ToString() + ", " + pair.Item2.ToString() + "]");
+                                    Console.WriteLine("here");
+                                }
+                                    string fullList = pair.Item1.ToString() + pair.Item2.ToString() + i.ToString();
+                                if (fullList.ToCharArray().Distinct().Count() == fullList.Length)
+                                {
+                                    if (fullList.Length == pandigitalCount)
+                                    {
+                                        results.Add(i);
+                                        LogList.Add("N: " + pandigitalCount.ToString() + " Number: " + i.ToString() + " Factors: [" + pair.Item1.ToString() + ", " + pair.Item2.ToString() + "]");
+                                    }
                                 }
                             }
                         }
                     }
+                    Output = results.Distinct().Sum().ToString();
+                }
+                LogToFile();
+                LogList.Clear();
+            }
+        }
+        public static bool HasExcludedDigits(string fullList, string[] excludedDigits)
+        {
+            for (int j = 0; j < excludedDigits.Length; j++)
+            {
+                if (fullList.Contains(excludedDigits[j]))
+                {
+                    return true;
                 }
             }
-            LogFilePath = @"C:\Users\user\Desktop\Multipliers.txt";
-            LogToFile();
-            Output = results.Distinct().Sum().ToString();
+            return false;
+        }
+        public static string[] GetExcludedDigits(int digitCount)
+        {
+            switch(digitCount)
+            {
+                case 4:
+                    return new string[] { "5", "6", "7", "8", "9", "0" };
+                case 5:
+                    return new string[] {"6", "7", "8", "9", "0" };
+                case 6:
+                    return new string[] { "7", "8", "9", "0" };
+                case 7:
+                    return new string[] { "8", "9", "0" };
+                case 8:
+                    return new string[] {"9", "0" };
+                default:
+                    return new string[] { "0" };
+            }
+        }
+        public static List<Tuple<int, int>> GetFactorPairs(int Value, string[] excludedDigits)
+        {
+            var factorPairs = new List<Tuple<int, int>>();
+
+            factorPairs.Add(new Tuple<int, int>(1, Value));
+
+            for (int i = 2; i < Math.Sqrt(Value) + 1; i++)
+            {
+                if (Value % i == 0)
+                {
+                    if (!HasExcludedDigits(i.ToString(), excludedDigits))
+                    {
+                        if (!HasExcludedDigits((Value / i).ToString(), excludedDigits))
+                        {
+                            factorPairs.Add(new Tuple<int, int>(i, Value / i));
+                        }
+                    }
+                }
+            }
+
+            return factorPairs;
         }
     }
 }

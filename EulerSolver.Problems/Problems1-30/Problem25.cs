@@ -40,6 +40,7 @@ namespace EulerSolver.Problems
             while(currentTerm.DigitCount() < 1000)
             {
                 BigInteger temp = currentTerm.Value;
+                
                 currentTerm.Value = currentTerm.Value + previousTerm.Value;
                 index++;
                 previousTerm.Value = temp;

@@ -571,9 +571,6 @@ namespace EulerSolver.Legacy
                 squares += i*i;
 
             }
-            Console.WriteLine(sum);
-            Console.WriteLine(squares);
-            
             return Math.Abs(sum*sum - squares);
         }
         private static Int64 SumSievePrimesFoAllBelowMax(int max)

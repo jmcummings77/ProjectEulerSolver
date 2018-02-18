@@ -25,7 +25,7 @@ namespace EulerSolver.Problems
         }
         public override void Solve()
         {
-            int upperLimit = 100000;
+            int upperLimit = 6;
             List<int> primes = new List<int>();
             primes.Add(1);
             for(int result = 2; result < upperLimit; result++)
@@ -39,7 +39,8 @@ namespace EulerSolver.Problems
                         sums[j] += sums[j - primes[i]];
                     }
                 }
-                if(sums.Last() > 5000)
+                Output = sums.Last().ToString();
+                if (sums.Last() > 5000)
                 {
                     Output = result.ToString();
                     break;
