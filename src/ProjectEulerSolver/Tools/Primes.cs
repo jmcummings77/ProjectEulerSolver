@@ -54,6 +54,51 @@ public static class Primes
     /// <summary>All primes up to and including <paramref name="limit"/>, in ascending order.</summary>
     public static int[] UpTo(int limit) => FromSieve(Sieve(limit));
 
+    /// <summary>
+    /// The primes up to and including <paramref name="max"/> in ascending order, produced lazily by a segmented
+    /// sieve. Memory does not grow with <paramref name="max"/>, so this works right up to <see cref="int.MaxValue"/>,
+    /// where <see cref="Sieve"/> would need two billion flags.
+    /// </summary>
+    public static IEnumerable<int> Enumerate(int max)
+    {
+        const int BlockLength = 1 << 16;
+        if (max < 2)
+        {
+            yield break;
+        }
+
+        // Every composite up to max has a prime factor of at most sqrt(max), so those primes cross off one
+        // block at a time. Positions are longs because low + BlockLength can pass int.MaxValue.
+        var basePrimes = UpTo((int)NumberTheory.ISqrt(max));
+        var composite = new bool[BlockLength];
+        for (long low = 2; low <= max; low += BlockLength)
+        {
+            var high = Math.Min(low + BlockLength, max + 1L); // Exclusive.
+            Array.Clear(composite);
+            foreach (var prime in basePrimes)
+            {
+                var square = (long)prime * prime;
+                if (square >= high)
+                {
+                    break;
+                }
+
+                for (var multiple = Math.Max(square, (low + prime - 1) / prime * prime); multiple < high; multiple += prime)
+                {
+                    composite[multiple - low] = true;
+                }
+            }
+
+            for (var value = low; value < high; value++)
+            {
+                if (!composite[value - low])
+                {
+                    yield return (int)value;
+                }
+            }
+        }
+    }
+
     /// <summary>Number of distinct primes dividing n, for every n ≤ limit, computed with a sieve.</summary>
     public static int[] DistinctPrimeFactorCounts(int limit)
     {

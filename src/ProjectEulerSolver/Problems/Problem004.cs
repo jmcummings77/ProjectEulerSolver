@@ -21,7 +21,7 @@ public sealed class Problem004 : Problem
         ArgumentOutOfRangeException.ThrowIfLessThan(digits, 1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(digits, 9); // Two 9-digit factors stay below 10^18; two 10-digit ones need not.
 
-        var smallest = PowerOfTen(digits - 1);
+        var smallest = NumberTheory.PowerOfTen(digits - 1);
         var largest = smallest * 10 - 1;
 
         // A product of two such factors has 2·digits or 2·digits − 1 digits. Palindromes of either length are
@@ -66,16 +66,5 @@ public sealed class Problem004 : Problem
         }
 
         return false;
-    }
-
-    private static long PowerOfTen(int exponent)
-    {
-        long power = 1;
-        for (var i = 0; i < exponent; i++)
-        {
-            power *= 10;
-        }
-
-        return power;
     }
 }

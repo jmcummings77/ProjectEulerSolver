@@ -265,4 +265,112 @@ public class ToolsTests
     [Fact]
     public void MaximumPathSum_solves_the_example_triangle() =>
         Assert.Equal(23, NumberTriangle.MaximumPathSum(["3", "7 4", "2 4 6", "8 5 9 3"]));
+
+    [Fact]
+    public void MaximumPathSum_handles_negatives_and_totals_beyond_an_int()
+    {
+        Assert.Equal(-1, NumberTriangle.MaximumPathSum(["-1"]));
+        Assert.Equal(-4, NumberTriangle.MaximumPathSum(["-3", "-1 -5"]));
+        Assert.Equal(2L * int.MaxValue, NumberTriangle.MaximumPathSum([$"{int.MaxValue}", $"1 {int.MaxValue}"]));
+    }
+
+    [Fact]
+    public void MaximumPathSum_rejects_malformed_triangles()
+    {
+        Assert.Throws<ArgumentException>(() => NumberTriangle.MaximumPathSum([]));
+        Assert.Throws<ArgumentException>(() => NumberTriangle.MaximumPathSum(["1", "2"]));
+        Assert.Throws<ArgumentException>(() => NumberTriangle.MaximumPathSum(["1", "2 x"]));
+        Assert.Throws<ArgumentException>(() => NumberTriangle.MaximumPathSum(["1", null!]));
+        Assert.Throws<ArgumentNullException>(() => NumberTriangle.MaximumPathSum(null!));
+    }
+
+    [Fact]
+    public void Enumerate_yields_the_same_primes_as_the_plain_sieve_across_block_edges()
+    {
+        // 200,000 spans three of the segmented sieve's 65,536-number blocks.
+        Assert.Equal(Primes.UpTo(200_000), Primes.Enumerate(200_000));
+        Assert.Empty(Primes.Enumerate(1));
+        Assert.Equal(new[] { 2 }, Primes.Enumerate(2));
+        Assert.Equal(new[] { 2, 3 }, Primes.Enumerate(4));
+        Assert.Equal(65_537, Primes.Enumerate(65_537).Last());
+    }
+
+    [Fact]
+    public void Enumerate_works_at_the_top_of_the_int_range()
+    {
+        // The Mersenne prime 2^31 − 1 is the last value an int can hold; skip ahead rather than walk two billion numbers.
+        Assert.True(Primes.IsPrime(int.MaxValue));
+        Assert.Equal(new[] { 2, 3, 5, 7 }, Primes.Enumerate(int.MaxValue).Take(4));
+    }
+
+    [Fact]
+    public void PowerOfTen_covers_every_power_that_fits_in_a_long()
+    {
+        Assert.Equal(1, NumberTheory.PowerOfTen(0));
+        Assert.Equal(1_000, NumberTheory.PowerOfTen(3));
+        Assert.Equal(1_000_000_000_000_000_000, NumberTheory.PowerOfTen(18));
+        Assert.Throws<ArgumentOutOfRangeException>(() => NumberTheory.PowerOfTen(19));
+        Assert.Throws<ArgumentOutOfRangeException>(() => NumberTheory.PowerOfTen(-1));
+    }
+
+    [Theory]
+    [InlineData(12, 345, 12_345)]
+    [InlineData(7, 0, 70)]
+    [InlineData(0, 42, 42)]
+    [InlineData(39, 186, 39_186)]
+    public void Concatenate_joins_decimal_digits(long left, long right, long expected) =>
+        Assert.Equal(expected, Digits.Concatenate(left, right));
+
+    [Fact]
+    public void Concatenate_rejects_negatives_and_overflow()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => Digits.Concatenate(-1, 2));
+        Assert.Throws<ArgumentOutOfRangeException>(() => Digits.Concatenate(1, -2));
+        Assert.Throws<OverflowException>(() => Digits.Concatenate(long.MaxValue, 1));
+    }
+
+    [Theory]
+    [InlineData(585, 2, true)] // 1001001001 in binary: the statement example of Problem 36.
+    [InlineData(585, 10, true)]
+    [InlineData(6, 2, false)] // 110
+    [InlineData(0, 2, true)]
+    [InlineData(8, 3, true)] // 22 in base 3
+    [InlineData(long.MaxValue, 2, true)] // 63 ones
+    [InlineData(long.MaxValue, 10, false)] // Its reversal does not fit in a long.
+    [InlineData(-5, 10, false)]
+    public void IsPalindrome_works_in_any_radix(long n, int radix, bool expected) =>
+        Assert.Equal(expected, Digits.IsPalindrome(n, radix));
+
+    [Fact]
+    public void IsPalindrome_in_a_radix_matches_string_reversal()
+    {
+        for (var n = 0; n < 5_000; n++)
+        {
+            foreach (var radix in new[] { 2, 8, 10, 16 })
+            {
+                var text = Convert.ToString(n, radix);
+                Assert.Equal(Digits.IsPalindrome(text), Digits.IsPalindrome(n, radix));
+            }
+        }
+    }
+
+    [Fact]
+    public void MultisetKey_is_shared_exactly_by_digit_permutations()
+    {
+        Assert.Equal(Digits.MultisetKey(125_874), Digits.MultisetKey(251_748));
+        Assert.NotEqual(Digits.MultisetKey(1), Digits.MultisetKey(10));
+        Assert.NotEqual(Digits.MultisetKey(112), Digits.MultisetKey(122));
+        Assert.Equal(Digits.MultisetKey(-321), Digits.MultisetKey(123));
+        Assert.Equal(Digits.MultisetKey(1_999_999_999_999_999_999), Digits.MultisetKey(9_199_999_999_999_999_999)); // Eighteen nines each.
+
+        // Agrees with the sorted-string key for every pair in a range.
+        var numbers = Enumerable.Range(0, 2_000).Select(n => (long)n * 7919 % 100_000).ToArray();
+        foreach (var a in numbers.Take(200))
+        {
+            foreach (var b in numbers)
+            {
+                Assert.Equal(Digits.SortedKey(a) == Digits.SortedKey(b), Digits.MultisetKey(a) == Digits.MultisetKey(b));
+            }
+        }
+    }
 }

@@ -125,18 +125,7 @@ public sealed class Problem060 : Problem
                 return false;
             }
 
-            return Primes.IsPrime(Concatenate(a, b)) && Primes.IsPrime(Concatenate(b, a));
-        }
-
-        private static long Concatenate(long a, long b)
-        {
-            var shifted = a;
-            for (var m = b; m > 0; m /= 10)
-            {
-                shifted *= 10;
-            }
-
-            return shifted + b;
+            return Primes.IsPrime(Digits.Concatenate(a, b)) && Primes.IsPrime(Digits.Concatenate(b, a));
         }
     }
 }

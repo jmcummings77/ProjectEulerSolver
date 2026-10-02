@@ -15,10 +15,12 @@ public sealed class Problem031 : Problem
     /// <summary>
     /// How many different ways <paramref name="target"/> can be made using any number of coins of the given denominations.
     /// </summary>
-    /// <param name="target">The amount to make; zero or more.</param>
+    /// <param name="target">The amount to make, from 0 to 1,000,000 (the count is kept for every amount up to the target).</param>
     /// <param name="coins">The distinct, positive coin denominations.</param>
     public static BigInteger Solve(int target, IReadOnlyList<int> coins)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(target);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(target, 1_000_000);
         if (coins.Distinct().Count() != coins.Count)
         {
             throw new ArgumentException("Coin denominations must be distinct.", nameof(coins));

@@ -34,8 +34,8 @@ public sealed class Problem032 : Problem
         // and leaves floor(digits / 2) digits for the product. Taking a < b (equal factors would repeat a
         // digit), a is the shorter factor and has at most (x + y) / 2 digits.
         var factorDigits = (digits + 1) / 2;
-        var multiplicandLimit = PowerOfTen(factorDigits / 2);
-        var productLimit = PowerOfTen(digits / 2);
+        var multiplicandLimit = (int)NumberTheory.PowerOfTen(factorDigits / 2);
+        var productLimit = (int)NumberTheory.PowerOfTen(digits / 2);
 
         var products = new HashSet<int>();
         for (var a = 1; a < multiplicandLimit; a++)
@@ -45,7 +45,7 @@ public sealed class Problem032 : Problem
                 var product = a * b;
 
                 // The pandigital test also rejects identities of the wrong total length.
-                if (Digits.IsPandigital(Concatenate(Concatenate(a, b), product), digits))
+                if (Digits.IsPandigital(Digits.Concatenate(Digits.Concatenate(a, b), product), digits))
                 {
                     products.Add(product);
                 }
@@ -53,27 +53,5 @@ public sealed class Problem032 : Problem
         }
 
         return products;
-    }
-
-    private static int PowerOfTen(int exponent)
-    {
-        var power = 1;
-        for (var i = 0; i < exponent; i++)
-        {
-            power *= 10;
-        }
-
-        return power;
-    }
-
-    /// <summary>The number written as the digits of <paramref name="left"/> followed by those of <paramref name="right"/> (positive).</summary>
-    private static long Concatenate(long left, int right)
-    {
-        for (var rest = right; rest > 0; rest /= 10)
-        {
-            left *= 10;
-        }
-
-        return left + right;
     }
 }

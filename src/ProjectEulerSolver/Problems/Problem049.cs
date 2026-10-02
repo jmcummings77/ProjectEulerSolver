@@ -43,7 +43,7 @@ public sealed class Problem049 : Problem
                 continue;
             }
 
-            var signature = Signature(prime);
+            var signature = Digits.MultisetKey(prime);
             if (!groups.TryGetValue(signature, out var members))
             {
                 groups[signature] = members = [];
@@ -66,7 +66,7 @@ public sealed class Problem049 : Problem
                         break;
                     }
 
-                    if (isPrime[third] && Signature(third) == signature)
+                    if (isPrime[third] && Digits.MultisetKey(third) == signature)
                     {
                         sequences.Add($"{members[i]}{members[j]}{third}");
                     }
@@ -81,14 +81,4 @@ public sealed class Problem049 : Problem
 
     // Counts each digit value in its own four bits (a count is at most 7), so two numbers share a signature
     // exactly when one is a permutation of the other.
-    private static long Signature(int n)
-    {
-        long signature = 0;
-        for (; n > 0; n /= 10)
-        {
-            signature += 1L << (4 * (n % 10));
-        }
-
-        return signature;
-    }
 }

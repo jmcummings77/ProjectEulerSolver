@@ -19,6 +19,21 @@ public static class NumberTheory
     /// <summary>Least common multiple. Always non-negative, and zero when either argument is zero.</summary>
     public static long Lcm(long a, long b) => a == 0 || b == 0 ? 0 : Math.Abs(a / Gcd(a, b) * b);
 
+    /// <summary>10 raised to <paramref name="exponent"/>, for exponents 0 to 18 (the largest power of ten in a long).</summary>
+    public static long PowerOfTen(int exponent)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(exponent);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(exponent, 18);
+
+        long power = 1;
+        for (var i = 0; i < exponent; i++)
+        {
+            power *= 10;
+        }
+
+        return power;
+    }
+
     /// <summary>Integer square root: the largest s with s*s ≤ n. Valid for every non-negative long.</summary>
     public static long ISqrt(long n)
     {

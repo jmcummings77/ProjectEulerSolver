@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Reflection;
 using ProjectEulerSolver.Problems;
 using Xunit;
 
@@ -97,6 +98,57 @@ public class ParameterizedSolverTests
         Assert.Equal(0, Problem008.Solve("1010", 2));
         Assert.Throws<ArgumentOutOfRangeException>(() => Problem008.Solve("123", 4));
         Assert.Throws<ArgumentException>(() => Problem008.Solve("12a", 2));
+    }
+
+    /// <summary>Problems whose statement fixes nothing that could sensibly vary, so they have no general solver.</summary>
+    private static readonly int[] WithoutParameters = [33, 34, 44, 46, 63];
+
+    private static readonly Type[] AllowedParameterTypes =
+    [
+        typeof(int),
+        typeof(long),
+        typeof(BigInteger),
+        typeof(string),
+        typeof(IReadOnlyList<int>),
+        typeof(IReadOnlyList<string>),
+    ];
+
+    [Fact]
+    public void Every_problem_follows_the_general_solver_convention()
+    {
+        foreach (var problem in ProblemCatalog.All)
+        {
+            var overloads = problem.GetType()
+                .GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                .Where(method => method.Name == nameof(Problem.Solve))
+                .ToArray();
+
+            if (WithoutParameters.Contains(problem.Number))
+            {
+                Assert.Empty(overloads);
+                Assert.Null(ParameterizedSolver.Find(problem));
+                continue;
+            }
+
+            var solver = Assert.Single(overloads);
+            Assert.Same(solver, ParameterizedSolver.Find(problem));
+            Assert.NotEqual(typeof(object), solver.ReturnType);
+            Assert.NotEqual(typeof(void), solver.ReturnType);
+            Assert.NotEmpty(solver.GetParameters());
+            Assert.All(solver.GetParameters(), parameter =>
+            {
+                Assert.Contains(parameter.ParameterType, AllowedParameterTypes);
+                Assert.False(parameter.HasDefaultValue, $"Problem {problem.Number}: {parameter.Name} has a default value.");
+            });
+        }
+    }
+
+    [Fact]
+    public void Problem031_rejects_targets_outside_its_range()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => Problem031.Solve(-1, [1, 2]));
+        Assert.Throws<ArgumentOutOfRangeException>(() => Problem031.Solve(1_000_001, [1, 2]));
+        Assert.Equal(new BigInteger(500_001), Problem031.Solve(1_000_000, [1, 2])); // One way for each number of 2s from 0 to 500,000.
     }
 
     [Fact]

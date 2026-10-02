@@ -109,7 +109,8 @@ public static class Program
         try
         {
             var answer = ParameterizedSolver.Solve(problem, parameters);
-            Console.WriteLine($"{answer}");
+            // A list answer is printed one item per line; anything else through a single ToString call.
+            Console.WriteLine(answer is IEnumerable<string> items ? string.Join(Environment.NewLine, items) : answer.ToString());
             Console.Error.WriteLine($"Problem {problem.Number} ({problem.Title}) solved in {stopwatch.Elapsed.TotalMilliseconds:N0} ms");
             return 0;
         }

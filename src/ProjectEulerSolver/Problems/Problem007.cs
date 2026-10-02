@@ -9,7 +9,6 @@ public sealed class Problem007 : Problem
     // 2^31 − 1 is the 105,097,565th prime, so this is the last index whose prime fits in an int.
     private const int LargestIndex = 105_097_565;
 
-    private const int BlockLength = 1 << 16;
 
     public override int Number => 7;
 
@@ -32,35 +31,12 @@ public sealed class Problem007 : Problem
         var estimate = n < 6 ? 11 : Math.Ceiling(n * (Math.Log(n) + Math.Log(Math.Log(n))));
         var bound = (long)Math.Min(estimate, int.MaxValue);
 
-        // A segmented sieve of Eratosthenes over 2..bound. Every composite in that range has a prime factor of at
-        // most sqrt(bound), so those primes cross off one block at a time and memory does not grow with n.
-        var basePrimes = Primes.UpTo((int)NumberTheory.ISqrt(bound));
-        var composite = new bool[BlockLength];
         var remaining = n;
-        for (long low = 2; low <= bound; low += BlockLength)
+        foreach (var prime in Primes.Enumerate((int)bound))
         {
-            var high = Math.Min(low + BlockLength, bound + 1); // Exclusive.
-            Array.Clear(composite);
-            foreach (var prime in basePrimes)
+            if (--remaining == 0)
             {
-                var square = (long)prime * prime;
-                if (square >= high)
-                {
-                    break;
-                }
-
-                for (var multiple = Math.Max(square, (low + prime - 1) / prime * prime); multiple < high; multiple += prime)
-                {
-                    composite[multiple - low] = true;
-                }
-            }
-
-            for (var value = low; value < high; value++)
-            {
-                if (!composite[value - low] && --remaining == 0)
-                {
-                    return (int)value;
-                }
+                return prime;
             }
         }
 

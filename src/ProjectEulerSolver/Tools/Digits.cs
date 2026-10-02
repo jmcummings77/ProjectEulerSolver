@@ -97,6 +97,25 @@ public static class Digits
     /// <summary>True when n is non-negative and its decimal representation is a palindrome.</summary>
     public static bool IsPalindrome(long n) => n >= 0 && n == Reverse(n);
 
+    /// <summary>True when n is non-negative and reads the same in both directions when written in base <paramref name="radix"/> (2 or more).</summary>
+    public static bool IsPalindrome(long n, int radix)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(radix, 2);
+        if (n < 0)
+        {
+            return false;
+        }
+
+        // The reversal has as many digits as n but can be larger than a long, so accumulate it in 128 bits.
+        UInt128 reversed = 0;
+        for (var rest = n; rest > 0; rest /= radix)
+        {
+            reversed = reversed * (UInt128)radix + (UInt128)(rest % radix);
+        }
+
+        return reversed == (UInt128)n;
+    }
+
     /// <summary>True when n is non-negative and its decimal representation is a palindrome.</summary>
     public static bool IsPalindrome(BigInteger n) => n.Sign >= 0 && IsPalindrome(n.ToString());
 
@@ -121,6 +140,42 @@ public static class Digits
         return count == length;
     }
 
+    /// <summary>The decimal digits of <paramref name="left"/> followed by those of <paramref name="right"/>, as one number. Both must be non-negative.</summary>
+    public static long Concatenate(long left, long right)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(left);
+        ArgumentOutOfRangeException.ThrowIfNegative(right);
+
+        var shifted = left;
+        var rest = right;
+        do
+        {
+            shifted = checked(shifted * 10);
+            rest /= 10;
+        }
+        while (rest > 0);
+
+        return checked(shifted + right);
+    }
+
+    /// <summary>
+    /// A key shared by exactly those numbers whose magnitudes have the same multiset of decimal digits:
+    /// ten 5-bit counters, one per digit. Cheaper than <see cref="SortedKey"/> because nothing is allocated.
+    /// </summary>
+    public static long MultisetKey(long n)
+    {
+        long key = 0;
+        var magnitude = Magnitude(n);
+        do
+        {
+            key += 1L << (5 * (int)(magnitude % 10)); // A long has at most 19 digits, so no counter can overflow 5 bits.
+            magnitude /= 10;
+        }
+        while (magnitude > 0);
+
+        return key;
+    }
+
     /// <summary>A canonical key shared by all numbers with the same multiset of digits.</summary>
     public static string SortedKey(BigInteger n)
     {
@@ -130,7 +185,7 @@ public static class Digits
     }
 
     /// <summary>True when |a| and |b| contain exactly the same digits in some order.</summary>
-    public static bool ArePermutations(long a, long b) => SortedKey(a) == SortedKey(b);
+    public static bool ArePermutations(long a, long b) => MultisetKey(a) == MultisetKey(b);
 
     private static ulong Magnitude(long n) => n < 0 ? (ulong)(-(n + 1)) + 1 : (ulong)n;
 

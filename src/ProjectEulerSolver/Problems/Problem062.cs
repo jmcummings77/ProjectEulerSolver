@@ -1,3 +1,5 @@
+using ProjectEulerSolver.Tools;
+
 namespace ProjectEulerSolver.Problems;
 
 /// <summary>The smallest cube for which exactly five permutations of its digits are also cube.</summary>
@@ -55,23 +57,8 @@ public sealed class Problem062 : Problem
                 nextLength = checked(nextLength * 10);
             }
 
-            var key = DigitCountKey(cube);
+            var key = Digits.MultisetKey(cube);
             groups[key] = groups.TryGetValue(key, out var group) ? (group.Smallest, group.Count + 1) : (cube, 1);
         }
-    }
-
-    /// <summary>
-    /// A key shared by exactly the numbers with the same multiset of digits: the count of each digit in five bits.
-    /// A long has at most 19 digits, so no count overflows its field.
-    /// </summary>
-    private static long DigitCountKey(long n)
-    {
-        long key = 0;
-        for (; n > 0; n /= 10)
-        {
-            key += 1L << (5 * (int)(n % 10));
-        }
-
-        return key;
     }
 }

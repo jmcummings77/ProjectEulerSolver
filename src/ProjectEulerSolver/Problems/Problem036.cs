@@ -1,3 +1,5 @@
+using ProjectEulerSolver.Tools;
+
 namespace ProjectEulerSolver.Problems;
 
 /// <summary>The sum of all numbers below one million that are palindromic in base 10 and base 2.</summary>
@@ -41,7 +43,7 @@ public sealed class Problem036 : Problem
                     return total;
                 }
 
-                if (IsPalindrome(palindrome, radix))
+                if (Digits.IsPalindrome(palindrome, radix))
                 {
                     total += palindrome;
                 }
@@ -62,17 +64,5 @@ public sealed class Problem036 : Problem
         }
 
         return palindrome;
-    }
-
-    private static bool IsPalindrome(long n, int radix)
-    {
-        // The reversal has as many digits as n, so it is below radix * n and cannot overflow here.
-        long reversed = 0;
-        for (var rest = n; rest > 0; rest /= radix)
-        {
-            reversed = reversed * radix + rest % radix;
-        }
-
-        return reversed == n;
     }
 }
