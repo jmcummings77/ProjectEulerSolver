@@ -5,14 +5,20 @@ namespace ProjectEulerSolver.Cli;
 /// <summary>Command-line runner: solves one, several or all problems and reports timings.</summary>
 public static class Program
 {
-    public static int Main(string[] args) =>
-        args switch
+    public static int Main(string[] args)
+    {
+        if (args.Length == 0 || args[0] is "--help" or "-h")
         {
-            [] or ["--help"] or ["-h"] => Usage(),
-            ["--all"] => Run(ProblemCatalog.All),
-            ["--list"] => List(),
+            return Usage();
+        }
+
+        return args[0] switch
+        {
+            "--all" => Run(ProblemCatalog.All),
+            "--list" => List(),
             _ => RunSelected(args),
         };
+    }
 
     private static int Usage()
     {
