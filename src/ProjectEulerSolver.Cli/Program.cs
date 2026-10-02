@@ -1,90 +1,96 @@
 using System.Diagnostics;
-using ProjectEulerSolver;
 
-return args switch
+namespace ProjectEulerSolver.Cli;
+
+/// <summary>Command-line runner: solves one, several or all problems and reports timings.</summary>
+public static class Program
 {
-    [] or ["--help"] or ["-h"] => Usage(),
-    ["--all"] => Run(ProblemCatalog.All),
-    ["--list"] => List(),
-    _ => RunSelected(args),
-};
+    public static int Main(string[] args) =>
+        args switch
+        {
+            [] or ["--help"] or ["-h"] => Usage(),
+            ["--all"] => Run(ProblemCatalog.All),
+            ["--list"] => List(),
+            _ => RunSelected(args),
+        };
 
-static int Usage()
-{
-    Console.WriteLine("""
-        Project Euler solver
-
-        usage:
-          euler <number> [<number> ...]   solve the given problem(s)
-          euler --all                     solve every problem and report timings
-          euler --list                    list the solved problems
-
-        examples:
-          dotnet run --project src/ProjectEulerSolver.Cli -- 42
-          dotnet run --project src/ProjectEulerSolver.Cli -c Release -- --all
-        """);
-    return 0;
-}
-
-static int List()
-{
-    foreach (var problem in ProblemCatalog.All)
+    private static int Usage()
     {
-        Console.WriteLine($"{problem.Number,3}  {problem.Title}");
+        Console.WriteLine("""
+            Project Euler solver
+
+            usage:
+              euler <number> [<number> ...]   solve the given problem(s)
+              euler --all                     solve every problem and report timings
+              euler --list                    list the solved problems
+
+            examples:
+              dotnet run --project src/ProjectEulerSolver.Cli -- 42
+              dotnet run --project src/ProjectEulerSolver.Cli -c Release -- --all
+            """);
+        return 0;
     }
 
-    return 0;
-}
-
-static int RunSelected(string[] arguments)
-{
-    var selected = new List<Problem>();
-    foreach (var argument in arguments)
+    private static int List()
     {
-        if (!int.TryParse(argument, out var number))
+        foreach (var problem in ProblemCatalog.All)
         {
-            Console.Error.WriteLine($"'{argument}' is not a problem number.");
-            return 2;
+            Console.WriteLine($"{problem.Number,3}  {problem.Title}");
         }
 
-        var problem = ProblemCatalog.Find(number);
-        if (problem is null)
-        {
-            Console.Error.WriteLine($"Problem {number} has not been solved yet. Use --list to see what is available.");
-            return 2;
-        }
-
-        selected.Add(problem);
+        return 0;
     }
 
-    return Run(selected);
-}
-
-static int Run(IReadOnlyList<Problem> problems)
-{
-    Console.WriteLine($"{"#",3}  {"Title",-42} {"Answer",-20} {"Time",9}");
-    var failures = 0;
-    var total = Stopwatch.StartNew();
-    foreach (var problem in problems)
+    private static int RunSelected(string[] arguments)
     {
-        var stopwatch = Stopwatch.StartNew();
-        try
+        var selected = new List<Problem>();
+        foreach (var argument in arguments)
         {
-            var answer = problem.Solve();
-            Console.WriteLine($"{problem.Number,3}  {problem.Title,-42} {answer,-20} {stopwatch.Elapsed.TotalMilliseconds,7:N0} ms");
+            if (!int.TryParse(argument, out var number))
+            {
+                Console.Error.WriteLine($"'{argument}' is not a problem number.");
+                return 2;
+            }
+
+            var problem = ProblemCatalog.Find(number);
+            if (problem is null)
+            {
+                Console.Error.WriteLine($"Problem {number} has not been solved yet. Use --list to see what is available.");
+                return 2;
+            }
+
+            selected.Add(problem);
         }
-        catch (Exception exception) when (exception is InvalidOperationException or FileNotFoundException)
-        {
-            failures++;
-            Console.WriteLine($"{problem.Number,3}  {problem.Title,-42} FAILED: {exception.Message}");
-        }
+
+        return Run(selected);
     }
 
-    if (problems.Count > 1)
+    private static int Run(IReadOnlyList<Problem> problems)
     {
-        Console.WriteLine();
-        Console.WriteLine($"{problems.Count - failures}/{problems.Count} solved in {total.Elapsed.TotalSeconds:N1} s");
-    }
+        Console.WriteLine($"{"#",3}  {"Title",-42} {"Answer",-20} {"Time",9}");
+        var failures = 0;
+        var total = Stopwatch.StartNew();
+        foreach (var problem in problems)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                var answer = problem.Solve();
+                Console.WriteLine($"{problem.Number,3}  {problem.Title,-42} {answer,-20} {stopwatch.Elapsed.TotalMilliseconds,7:N0} ms");
+            }
+            catch (Exception exception) when (exception is InvalidOperationException or FileNotFoundException)
+            {
+                failures++;
+                Console.WriteLine($"{problem.Number,3}  {problem.Title,-42} FAILED: {exception.Message}");
+            }
+        }
 
-    return failures == 0 ? 0 : 1;
+        if (problems.Count > 1)
+        {
+            Console.WriteLine();
+            Console.WriteLine($"{problems.Count - failures}/{problems.Count} solved in {total.Elapsed.TotalSeconds:N1} s");
+        }
+
+        return failures == 0 ? 0 : 1;
+    }
 }
