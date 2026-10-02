@@ -5,19 +5,28 @@ namespace ProjectEulerSolver.Problems;
 /// <summary>How many digit factorial chains with a starting number below one million contain exactly sixty non-repeating terms.</summary>
 public sealed class Problem074 : Problem
 {
-    private const int Limit = 1_000_000;
-
     public override int Number => 74;
 
     public override string Title => "Digit Factorial Chains";
 
-    public override object Solve()
+    public override object Solve() => Solve(limit: 1_000_000, chainLength: 60);
+
+    /// <summary>
+    /// How many positive starting numbers below <paramref name="limit"/> have a digit factorial chain with exactly
+    /// <paramref name="chainLength"/> non-repeating terms.
+    /// </summary>
+    /// <param name="limit">Exclusive upper bound on the starting number: from 1 to <see cref="int.MaxValue"/>. The running time is proportional to it.</param>
+    /// <param name="chainLength">The number of non-repeating terms wanted: 1 or more. A length that no chain has simply gives zero.</param>
+    public static int Solve(int limit, int chainLength)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(limit, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(chainLength, 1);
+
         var chains = new DigitFactorialChains();
         var count = 0;
-        for (var start = 1; start < Limit; start++)
+        for (var start = 1; start < limit; start++)
         {
-            if (chains.Length(start) == 60)
+            if (chains.Length(start) == chainLength)
             {
                 count++;
             }
@@ -31,13 +40,25 @@ public sealed class Problem074 : Problem
     {
         private static readonly int[] Factorials = Enumerable.Range(0, 10).Select(d => (int)NumberTheory.Factorial(d)).ToArray();
 
-        // 7 × 9! = 2,540,160 bounds every term after the first for starts below ten million, so a flat array works.
-        private readonly int[] lengths = new int[7 * Factorials[9] + 1];
+        // An int has at most ten digits, so every term after the first is at most 10 × 9! = 3,628,800 and a flat
+        // array indexed by term covers them all.
+        private readonly int[] lengths = new int[10 * Factorials[9] + 1];
 
-        /// <summary>Number of non-repeating terms in the chain that starts at <paramref name="start"/>.</summary>
+        // The terms walked so far in the current call; kept between calls so that most of them allocate nothing.
+        private readonly List<int> path = [];
+
+        /// <summary>Number of non-repeating terms in the chain that starts at <paramref name="start"/> (1 or more).</summary>
         public int Length(int start)
         {
-            var path = new List<int>();
+            ArgumentOutOfRangeException.ThrowIfLessThan(start, 1);
+            if (start >= lengths.Length)
+            {
+                // Too large to be the image of any int, so it is not part of a loop and never comes back:
+                // its chain is itself followed by the chain of its image.
+                return 1 + Length(Next(start));
+            }
+
+            path.Clear();
             var current = start;
             while (lengths[current] == 0)
             {

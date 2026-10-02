@@ -9,11 +9,29 @@ public sealed class Problem079 : Problem
 
     public override string Title => "Passcode Derivation";
 
-    public override object Solve() => DerivePasscode(Resources.ReadLines("0079_keylog.txt"));
+    public override object Solve() => Solve(attempts: Resources.ReadLines("0079_keylog.txt"));
 
     /// <summary>
-    /// Each attempt says "a comes before b before c". Assuming no digit repeats, the shortest passcode is the
-    /// topological order of that precedence graph (Kahn's algorithm, smallest digit first on ties).
+    /// The shortest passcode consistent with <paramref name="attempts"/>, each of which gives some of the
+    /// passcode's digits in the order they appear in it, assuming that no digit occurs twice in the passcode.
+    /// When several passcodes of that length fit, the one that sorts first is returned.
+    /// </summary>
+    /// <param name="attempts">At least one login attempt; each is a non-empty string of decimal digits, of any length.</param>
+    /// <exception cref="InvalidOperationException">The attempts contradict each other, so no passcode without a repeated digit fits.</exception>
+    public static string Solve(IReadOnlyList<string> attempts)
+    {
+        if (attempts.Count == 0 || attempts.Any(attempt => attempt.Length == 0 || attempt.Any(c => c is < '0' or > '9')))
+        {
+            throw new ArgumentException("Expected at least one attempt, each a non-empty string of decimal digits.", nameof(attempts));
+        }
+
+        return DerivePasscode(attempts);
+    }
+
+    /// <summary>
+    /// Each attempt says "a comes before b before c". Assuming no digit repeats, the passcode needs every digit
+    /// seen exactly once, so the shortest one is a topological order of that precedence graph (Kahn's algorithm,
+    /// smallest digit first on ties).
     /// </summary>
     internal static string DerivePasscode(IEnumerable<string> loginAttempts)
     {
@@ -22,9 +40,12 @@ public sealed class Problem079 : Problem
         var predecessors = digits.ToDictionary(d => d, _ => new HashSet<char>());
         foreach (var attempt in attempts)
         {
-            predecessors[attempt[1]].Add(attempt[0]);
-            predecessors[attempt[2]].Add(attempt[0]);
-            predecessors[attempt[2]].Add(attempt[1]);
+            // Neighbouring pairs are enough: the order is transitive. A digit repeated within one attempt ends
+            // up before itself, which the cycle check below reports.
+            for (var i = 1; i < attempt.Length; i++)
+            {
+                predecessors[attempt[i]].Add(attempt[i - 1]);
+            }
         }
 
         var passcode = string.Empty;

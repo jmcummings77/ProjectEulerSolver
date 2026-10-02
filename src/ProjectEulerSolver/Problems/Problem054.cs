@@ -9,15 +9,64 @@ public sealed class Problem054 : Problem
 
     public override string Title => "Poker Hands";
 
-    public override object Solve() =>
-        Resources.ReadLines("0054_poker.txt")
-            .Select(line => line.Split(' '))
-            .Count(cards => PokerHand.Parse(cards[..5]).CompareTo(PokerHand.Parse(cards[5..])) > 0);
+    public override object Solve() => Solve(hands: Resources.ReadLines("0054_poker.txt"));
+
+    /// <summary>
+    /// How many of the deals in <paramref name="hands"/> Player 1 wins. Hands are ranked by the standard poker
+    /// categories and then by the usual tie-breaks, with A-2-3-4-5 counting as a five-high straight; a deal in
+    /// which the two hands rank equally is won by neither player.
+    /// </summary>
+    /// <param name="hands">
+    /// Any number of deals, one per item: ten different cards separated by spaces, Player 1's five followed by
+    /// Player 2's five. A card is a rank (2 to 9, T, J, Q, K or A) followed by a suit (C, D, H or S).
+    /// </param>
+    public static int Solve(IReadOnlyList<string> hands)
+    {
+        ArgumentNullException.ThrowIfNull(hands);
+
+        var wins = 0;
+        for (var i = 0; i < hands.Count; i++)
+        {
+            var cards = ParseDeal(i);
+            if (PokerHand.Parse(cards[..5]).CompareTo(PokerHand.Parse(cards[5..])) > 0)
+            {
+                wins++;
+            }
+        }
+
+        return wins;
+
+        string[] ParseDeal(int index)
+        {
+            var cards = (hands[index] ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (cards.Length != 10)
+            {
+                throw new ArgumentException($"Deal {index + 1} has {cards.Length} cards; expected ten.", nameof(hands));
+            }
+
+            foreach (var card in cards)
+            {
+                if (card.Length != 2 || !PokerHand.RankOrder.Contains(card[0]) || !PokerHand.Suits.Contains(card[1]))
+                {
+                    throw new ArgumentException($"Deal {index + 1} contains '{card}', which is not a card.", nameof(hands));
+                }
+            }
+
+            // A repeated card cannot come from one deck, and would allow hands (five of a kind) the ranking does not cover.
+            if (cards.Distinct().Count() != cards.Length)
+            {
+                throw new ArgumentException($"Deal {index + 1} contains the same card twice.", nameof(hands));
+            }
+
+            return cards;
+        }
+    }
 
     /// <summary>A five-card hand ranked by the standard poker categories, with kickers for tie-breaks.</summary>
     internal sealed class PokerHand : IComparable<PokerHand>
     {
-        private const string RankOrder = "23456789TJQKA";
+        internal const string RankOrder = "23456789TJQKA";
+        internal const string Suits = "CDHS";
 
         // Category (higher is better), then ranks ordered by how they should be compared.
         private readonly int category;
