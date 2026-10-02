@@ -4,8 +4,19 @@ Solutions to [Project Euler](https://projecteuler.net/) problems 1–79 in C# (.
 reusable number-theory toolkit, a console runner, and a test suite that checks every answer.
 
 This started as a weekend project many years ago. It has since been cleaned up so that every problem
-is a small, self-contained class, the shared maths lives in one place, and the whole set solves in a
-couple of seconds.
+is a small class, the shared maths lives in one place, and the whole set solves in a couple of
+seconds.
+
+## History
+
+The original code, visible in the git history before the 2026 rewrite, looks odd at first glance:
+every problem file carried its own copy of the prime sieve, GCD, digit helpers and so on, plus
+file-based logging. That was deliberate. The solutions were also submitted to HackerRank's Project
+Euler+ contest, whose editor accepts a single pasted source file and is a poor place to debug. Keeping
+each problem fully self-contained meant it could be worked on in Visual Studio or Rider and pasted
+across unchanged, with no risk of introducing errors while hand-merging helpers into one file.
+Duplication was the price of that workflow. Now that HackerRank is no longer the target, the shared
+code lives in `Tools/` and each problem is just the part that is specific to it.
 
 ## Layout
 
