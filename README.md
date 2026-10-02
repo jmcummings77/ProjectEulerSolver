@@ -23,7 +23,9 @@ come from the private repository the project started in. They were grafted into 
 the second parent of the 2021 "Initial code dump" commit. Build output and editor state were removed,
 a few machine- and account-specific strings were replaced with neutral placeholders, and a little
 unrelated scratch code was dropped, in those commits and in the 2021 dump; otherwise the code and the
-commit messages are as written at the time.
+commit messages are as written at the time. Much of that early work was done while travelling for
+work, in airports, on long flights and over a few vacation days, which is why many of those commits
+are timestamped on weekdays.
 
 ## Layout
 
