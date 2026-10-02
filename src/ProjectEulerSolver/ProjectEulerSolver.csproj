@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>ProjectEulerSolver</RootNamespace>
+    <Description>Solutions to Project Euler problems 1-79, with a small reusable number-theory toolkit.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ProjectEulerSolver.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\*.txt" LogicalName="%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>
