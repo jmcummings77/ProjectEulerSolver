@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectEulerSolver", "src\P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectEulerSolver.Cli", "src\ProjectEulerSolver.Cli\ProjectEulerSolver.Cli.csproj", "{0BFC7B57-4625-404B-B59F-0D61AEF87C6D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{08BBC2C0-E79F-49FC-8C32-DD7845E1C19A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectEulerSolver.Tests", "tests\ProjectEulerSolver.Tests\ProjectEulerSolver.Tests.csproj", "{53D34B4C-D43D-4850-84B3-B6A9464F6B75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +30,14 @@ Global
 		{0BFC7B57-4625-404B-B59F-0D61AEF87C6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BFC7B57-4625-404B-B59F-0D61AEF87C6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BFC7B57-4625-404B-B59F-0D61AEF87C6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53D34B4C-D43D-4850-84B3-B6A9464F6B75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53D34B4C-D43D-4850-84B3-B6A9464F6B75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53D34B4C-D43D-4850-84B3-B6A9464F6B75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53D34B4C-D43D-4850-84B3-B6A9464F6B75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B7BD1D9A-6D59-4513-915E-E4B553C60879} = {97B66F40-C30B-4B28-BC04-F3452418E42B}
 		{0BFC7B57-4625-404B-B59F-0D61AEF87C6D} = {97B66F40-C30B-4B28-BC04-F3452418E42B}
+		{53D34B4C-D43D-4850-84B3-B6A9464F6B75} = {08BBC2C0-E79F-49FC-8C32-DD7845E1C19A}
 	EndGlobalSection
 EndGlobal
