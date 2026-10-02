@@ -26,12 +26,18 @@ public static class Program
             Project Euler solver
 
             usage:
-              euler <number> [<number> ...]   solve the given problem(s)
-              euler --all                     solve every problem and report timings
-              euler --list                    list the solved problems
+              euler <number> [<number> ...]     solve the given problem(s)
+              euler <number> <name>=<value>...  solve one problem with other values than its statement's
+              euler --all                       solve every problem and report timings
+              euler --list                      list the solved problems and the parameters they take
+
+            Parameter values are whole numbers (1_000_000 is fine), text, or lists: comma-separated,
+            or @path to read a list from a file.
 
             examples:
               dotnet run --project src/ProjectEulerSolver.Cli -- 42
+              dotnet run --project src/ProjectEulerSolver.Cli -- 1 limit=1_000_000
+              dotnet run --project src/ProjectEulerSolver.Cli -- 31 target=500 coins=1,2,5,10,20,50,100,200
               dotnet run --project src/ProjectEulerSolver.Cli -c Release -- --all
             """);
         return 0;
@@ -41,7 +47,7 @@ public static class Program
     {
         foreach (var problem in ProblemCatalog.All)
         {
-            Console.WriteLine($"{problem.Number,3}  {problem.Title,-42} {problem.Url}");
+            Console.WriteLine($"{problem.Number,3}  {problem.Title,-42} {problem.Url,-36} {ParameterizedSolver.Signature(problem)}");
         }
 
         return 0;
@@ -50,8 +56,17 @@ public static class Program
     private static int RunSelected(string[] arguments)
     {
         var selected = new List<Problem>();
+        var parameters = new Dictionary<string, string>();
         foreach (var argument in arguments)
         {
+            // A value may be negative or a path, so only the part before '=' has to look like a name.
+            var separator = argument.IndexOf('=');
+            if (separator > 0 && char.IsLetter(argument[0]))
+            {
+                parameters[argument[..separator]] = argument[(separator + 1)..];
+                continue;
+            }
+
             if (argument.StartsWith('-'))
             {
                 Console.Error.WriteLine($"Unknown option '{argument}'. Use --help to see the available options.");
@@ -74,7 +89,36 @@ public static class Program
             selected.Add(problem);
         }
 
-        return Run(selected);
+        if (parameters.Count == 0)
+        {
+            return Run(selected);
+        }
+
+        if (selected.Count != 1)
+        {
+            Console.Error.WriteLine("Parameters apply to exactly one problem: give one problem number followed by name=value pairs.");
+            return 2;
+        }
+
+        return RunWith(selected[0], parameters);
+    }
+
+    private static int RunWith(Problem problem, Dictionary<string, string> parameters)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        try
+        {
+            var answer = ParameterizedSolver.Solve(problem, parameters);
+            Console.WriteLine($"{answer}");
+            Console.Error.WriteLine($"Problem {problem.Number} ({problem.Title}) solved in {stopwatch.Elapsed.TotalMilliseconds:N0} ms");
+            return 0;
+        }
+        catch (Exception exception) when (exception is ArgumentException or FormatException or IOException or InvalidOperationException)
+        {
+            // Bad arguments, an unreadable @file, or arguments for which the problem has no answer.
+            Console.Error.WriteLine(exception.Message);
+            return 2;
+        }
     }
 
     private static int Run(IReadOnlyList<Problem> problems)

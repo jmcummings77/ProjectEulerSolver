@@ -13,17 +13,21 @@ public static class Resources
     }
 
     /// <summary>Returns the non-empty lines of an embedded resource.</summary>
-    public static string[] ReadLines(string name) =>
-        ReadText(name)
-            .Split('\n')
+    public static string[] ReadLines(string name) => ParseLines(ReadText(name));
+
+    /// <summary>Parses a resource in Project Euler's <c>"A","B","C"</c> list format.</summary>
+    public static string[] ReadQuotedList(string name) => ParseList(ReadText(name));
+
+    /// <summary>Splits text into its non-empty lines, trimmed.</summary>
+    public static string[] ParseLines(string text) =>
+        text.Split('\n')
             .Select(line => line.Trim())
             .Where(line => line.Length > 0)
             .ToArray();
 
-    /// <summary>Parses a resource in Project Euler's <c>"A","B","C"</c> list format.</summary>
-    public static string[] ReadQuotedList(string name) =>
-        ReadText(name)
-            .Split(',')
+    /// <summary>Splits a comma-separated list into its non-empty items, trimming whitespace and surrounding quotes.</summary>
+    public static string[] ParseList(string text) =>
+        text.Split(',')
             .Select(item => item.Trim().Trim('"'))
             .Where(item => item.Length > 0)
             .ToArray();
