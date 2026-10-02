@@ -3,7 +3,13 @@ namespace ProjectEulerSolver.Tools;
 /// <summary>Prime sieves, primality tests and factorisation.</summary>
 public static class Primes
 {
-    private static readonly ulong[] MillerRabinBases = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37];
+    // Deterministic Miller-Rabin witness sets (Jaeschke; Sorenson and Webster) and the bounds they cover.
+    private static readonly ulong[] SmallBases = [2, 7, 61]; // n < 4,759,123,141
+    private static readonly ulong[] MediumBases = [2, 3, 5, 7, 11, 13, 17]; // n < 341,550,071,728,321
+    private static readonly ulong[] LargeBases = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]; // all 64-bit n
+
+    // Cheap trial divisors tried before Miller-Rabin; they reject most composites for a fraction of the cost.
+    private static readonly long[] SmallOddPrimes = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
 
     /// <summary>Sieve of Eratosthenes. Returns a table where <c>table[n]</c> is true when n is prime, for 0 ≤ n ≤ limit.</summary>
     public static bool[] Sieve(int limit)
@@ -30,14 +36,13 @@ public static class Primes
         return isPrime;
     }
 
-    /// <summary>All primes up to and including <paramref name="limit"/>, in ascending order.</summary>
-    public static int[] UpTo(int limit)
+    /// <summary>The primes marked in a sieve table, in ascending order.</summary>
+    public static int[] FromSieve(bool[] isPrime)
     {
-        var sieve = Sieve(limit);
         var primes = new List<int>();
-        for (var i = 2; i <= limit; i++)
+        for (var i = 2; i < isPrime.Length; i++)
         {
-            if (sieve[i])
+            if (isPrime[i])
             {
                 primes.Add(i);
             }
@@ -46,7 +51,30 @@ public static class Primes
         return [.. primes];
     }
 
-    /// <summary>Deterministic primality test for any non-negative 64-bit integer.</summary>
+    /// <summary>All primes up to and including <paramref name="limit"/>, in ascending order.</summary>
+    public static int[] UpTo(int limit) => FromSieve(Sieve(limit));
+
+    /// <summary>Number of distinct primes dividing n, for every n ≤ limit, computed with a sieve.</summary>
+    public static int[] DistinctPrimeFactorCounts(int limit)
+    {
+        var counts = new int[limit + 1];
+        for (var p = 2; p <= limit; p++)
+        {
+            if (counts[p] != 0)
+            {
+                continue; // Already counted a smaller prime factor, so p is composite.
+            }
+
+            for (var multiple = p; multiple <= limit; multiple += p)
+            {
+                counts[multiple]++;
+            }
+        }
+
+        return counts;
+    }
+
+    /// <summary>Deterministic primality test for any 64-bit integer (negatives, 0 and 1 are not prime).</summary>
     public static bool IsPrime(long n)
     {
         if (n < 2)
@@ -77,10 +105,18 @@ public static class Primes
             return true;
         }
 
+        foreach (var p in SmallOddPrimes)
+        {
+            if (n % p == 0)
+            {
+                return false;
+            }
+        }
+
         return MillerRabin((ulong)n);
     }
 
-    /// <summary>Prime factorisation as (prime, exponent) pairs in ascending prime order.</summary>
+    /// <summary>Prime factorisation as (prime, exponent) pairs in ascending prime order. Empty for n &lt; 2.</summary>
     public static IEnumerable<(long Prime, int Exponent)> Factor(long n)
     {
         if (n < 2)
@@ -88,7 +124,16 @@ public static class Primes
             yield break;
         }
 
-        for (long p = 2; p * p <= n; p += p == 2 ? 1 : 2)
+        // Trial division by 2 and then odd numbers. Whenever the remaining cofactor is itself prime we stop
+        // early instead of dividing all the way up to its square root; that check is only worth doing when
+        // the cofactor has just changed.
+        if (IsPrime(n))
+        {
+            yield return (n, 1);
+            yield break;
+        }
+
+        for (long p = 2; p <= n / p; p += p == 2 ? 1 : 2)
         {
             if (n % p != 0)
             {
@@ -103,6 +148,11 @@ public static class Primes
             }
 
             yield return (p, exponent);
+            if (n > 1 && IsPrime(n))
+            {
+                yield return (n, 1);
+                yield break;
+            }
         }
 
         if (n > 1)
@@ -111,15 +161,17 @@ public static class Primes
         }
     }
 
-    /// <summary>Number of distinct primes dividing n.</summary>
-    public static int DistinctPrimeFactorCount(long n) => Factor(n).Count();
-
-    /// <summary>Number of positive divisors of n, from its factorisation.</summary>
-    public static int DivisorCount(long n) =>
-        n == 1 ? 1 : Factor(n).Aggregate(1, (count, factor) => count * (factor.Exponent + 1));
+    /// <summary>Number of positive divisors of n (n ≥ 1), from its factorisation.</summary>
+    public static int DivisorCount(long n)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(n, 1);
+        return Factor(n).Aggregate(1, (count, factor) => count * (factor.Exponent + 1));
+    }
 
     private static bool MillerRabin(ulong n)
     {
+        var bases = n < 4_759_123_141 ? SmallBases : n < 341_550_071_728_321 ? MediumBases : LargeBases;
+
         var d = n - 1;
         var r = 0;
         while ((d & 1) == 0)
@@ -128,7 +180,7 @@ public static class Primes
             r++;
         }
 
-        foreach (var a in MillerRabinBases)
+        foreach (var a in bases)
         {
             if (a % n == 0)
             {

@@ -5,7 +5,7 @@ namespace ProjectEulerSolver.Problems;
 /// <summary>The n &lt; 10^7 for which φ(n) is a permutation of n and n/φ(n) is minimal.</summary>
 public sealed class Problem070 : Problem
 {
-    private const long Limit = 10_000_000;
+    private const int Limit = 10_000_000;
 
     public override int Number => 70;
 
@@ -13,30 +13,30 @@ public sealed class Problem070 : Problem
 
     public override object Solve()
     {
-        // To make n/φ(n) small, n wants few, large prime factors. A prime itself never works
-        // (φ(p) = p − 1 is not a permutation), so the next best shape is a product of two primes
-        // near √10^7 ≈ 3162, for which φ(pq) = (p − 1)(q − 1) comes for free.
-        var primes = Primes.UpTo(5000).Where(p => p > 2000).ToArray();
-
-        long bestN = 0;
-        var bestRatio = double.MaxValue;
-        for (var i = 0; i < primes.Length; i++)
+        // Sieve every totient below the limit and test each n exhaustively. Two cheap filters remove almost
+        // all the candidates before the digit comparison: permutations share a digit sum, so n ≡ φ(n) (mod 9),
+        // and only a ratio better than the best so far is worth checking at all.
+        var phi = NumberTheory.Totients(Limit - 1);
+        var bestN = 0;
+        var bestPhi = 1;
+        for (var n = 2; n < Limit; n++)
         {
-            for (var j = i + 1; j < primes.Length; j++)
+            var p = phi[n];
+            if ((n - p) % 9 != 0)
             {
-                var n = (long)primes[i] * primes[j];
-                if (n >= Limit)
-                {
-                    break;
-                }
+                continue;
+            }
 
-                var phi = (long)(primes[i] - 1) * (primes[j] - 1);
-                var ratio = (double)n / phi;
-                if (ratio < bestRatio && Digits.ArePermutations(n, phi))
-                {
-                    bestRatio = ratio;
-                    bestN = n;
-                }
+            // n/p < bestN/bestPhi, cross-multiplied to stay in integers.
+            if (bestN != 0 && (long)n * bestPhi >= (long)bestN * p)
+            {
+                continue;
+            }
+
+            if (Digits.ArePermutations(n, p))
+            {
+                bestN = n;
+                bestPhi = p;
             }
         }
 

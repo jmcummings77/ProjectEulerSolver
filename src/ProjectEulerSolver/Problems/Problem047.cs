@@ -1,3 +1,5 @@
+using ProjectEulerSolver.Tools;
+
 namespace ProjectEulerSolver.Problems;
 
 /// <summary>The first of four consecutive integers that each have four distinct prime factors.</summary>
@@ -11,23 +13,9 @@ public sealed class Problem047 : Problem
 
     public override object Solve()
     {
-        // Sieve the number of distinct prime factors: every prime bumps the count of its multiples.
-        var factorCounts = new int[Limit];
-        for (var p = 2; p < Limit; p++)
-        {
-            if (factorCounts[p] != 0)
-            {
-                continue;
-            }
-
-            for (var multiple = p; multiple < Limit; multiple += p)
-            {
-                factorCounts[multiple]++;
-            }
-        }
-
+        var factorCounts = Primes.DistinctPrimeFactorCounts(Limit);
         var run = 0;
-        for (var n = 2; n < Limit; n++)
+        for (var n = 2; n <= Limit; n++)
         {
             run = factorCounts[n] == 4 ? run + 1 : 0;
             if (run == 4)

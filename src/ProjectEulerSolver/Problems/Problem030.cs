@@ -1,5 +1,3 @@
-using ProjectEulerSolver.Tools;
-
 namespace ProjectEulerSolver.Problems;
 
 /// <summary>The sum of all numbers that can be written as the sum of fifth powers of their digits.</summary>
@@ -18,7 +16,13 @@ public sealed class Problem030 : Problem
         var total = 0;
         for (var n = 10; n <= limit; n++)
         {
-            if (Digits.Of(n).Sum(d => fifthPowers[d]) == n)
+            var sum = 0;
+            for (var m = n; m > 0; m /= 10)
+            {
+                sum += fifthPowers[m % 10];
+            }
+
+            if (sum == n)
             {
                 total += n;
             }

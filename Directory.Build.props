@@ -9,7 +9,10 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest</AnalysisLevel>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <Deterministic>true</Deterministic>
+    <!--
+      IDE0005 (unnecessary using) is only reported at build time when documentation generation is on
+      (dotnet/roslyn#41640). XML docs are not required on every member, so CS1591 is silenced.
+    -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>

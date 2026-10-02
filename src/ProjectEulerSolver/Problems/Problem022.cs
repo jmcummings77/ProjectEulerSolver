@@ -17,12 +17,9 @@ public sealed class Problem022 : Problem
         long total = 0;
         for (var i = 0; i < names.Length; i++)
         {
-            total += (i + 1) * AlphabetValue(names[i]);
+            total += (i + 1) * Words.AlphabetValue(names[i]);
         }
 
         return total;
     }
-
-    /// <summary>Sum of letter positions (A = 1, B = 2, ...). Shared with Problem 42.</summary>
-    internal static int AlphabetValue(string word) => word.Sum(c => c - 'A' + 1);
 }

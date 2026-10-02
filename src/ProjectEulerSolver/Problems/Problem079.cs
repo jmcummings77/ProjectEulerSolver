@@ -30,7 +30,13 @@ public sealed class Problem079 : Problem
         var passcode = string.Empty;
         while (predecessors.Count > 0)
         {
-            var next = predecessors.First(kv => kv.Value.Count == 0).Key;
+            var ready = predecessors.Where(kv => kv.Value.Count == 0).Select(kv => kv.Key).ToArray();
+            if (ready.Length == 0)
+            {
+                throw new InvalidOperationException("The login attempts imply a cyclic ordering, so no passcode is consistent with them.");
+            }
+
+            var next = ready.Min();
             passcode += next;
             predecessors.Remove(next);
             foreach (var remaining in predecessors.Values)

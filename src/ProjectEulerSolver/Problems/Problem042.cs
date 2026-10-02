@@ -11,5 +11,5 @@ public sealed class Problem042 : Problem
 
     public override object Solve() =>
         Resources.ReadQuotedList("0042_words.txt")
-            .Count(word => Figurate.IsTriangle(Problem022.AlphabetValue(word)));
+            .Count(word => Figurate.IsTriangle(Words.AlphabetValue(word)));
 }

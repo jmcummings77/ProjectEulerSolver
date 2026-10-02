@@ -1,5 +1,4 @@
 using System.Numerics;
-using ProjectEulerSolver.Tools;
 
 namespace ProjectEulerSolver.Problems;
 
@@ -12,10 +11,11 @@ public sealed class Problem025 : Problem
 
     public override object Solve()
     {
+        var threshold = BigInteger.Pow(10, 999); // The smallest 1000-digit number.
         BigInteger previous = 1;
         BigInteger current = 1;
         var index = 2;
-        while (Digits.Count(current) < 1000)
+        while (current < threshold)
         {
             (previous, current) = (current, previous + current);
             index++;

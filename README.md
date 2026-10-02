@@ -32,6 +32,8 @@ tests/ProjectEulerSolver.Tests/  xUnit tests: accepted answers for every problem
 
 ## Running
 
+Requires the .NET 8 SDK (`global.json` pins the 8.0 feature band; any 8.0.1xx or later 8.0 SDK works).
+
 Solve a problem (or several):
 
 ```bash
@@ -60,12 +62,13 @@ dotnet test
 
 ## Data files
 
-Every puzzle input (names, words, the poker hands, the keylog, the cipher text, both triangles, the
-20×20 grid and the 100 fifty-digit numbers) is embedded in the library from
-`src/ProjectEulerSolver/Resources/`, so nothing needs to be downloaded to run or test the solutions.
+Every puzzle input is embedded in the library from `src/ProjectEulerSolver/Resources/` (one file per
+problem that needs one), so nothing has to be downloaded to run or test the solutions.
 
-Problem 59 uses the original `cipher.txt`; Project Euler replaced that file in 2019, so the recorded
-answer (107359) differs from the one the site now accepts (129448).
+Problem 59 uses the cipher text that was inlined in the original code, stored as
+`0059_cipher_original.txt`. Project Euler replaced that file in 2019, so the recorded answer (107359)
+differs from the one the site now accepts (129448); the current `0059_cipher.txt` from the site is a
+different puzzle input and should not be dropped in under the old name.
 
 ## Notes
 

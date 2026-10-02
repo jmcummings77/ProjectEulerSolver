@@ -14,7 +14,7 @@ public sealed class Problem050 : Problem
     public override object Solve()
     {
         var isPrime = Primes.Sieve(Limit);
-        var primes = Primes.UpTo(Limit);
+        var primes = Primes.FromSieve(isPrime);
 
         // prefix[i] = sum of the first i primes, so any run sum is a difference of two prefixes.
         var prefix = new long[primes.Length + 1];

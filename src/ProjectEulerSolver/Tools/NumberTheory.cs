@@ -5,7 +5,7 @@ namespace ProjectEulerSolver.Tools;
 /// <summary>Greatest common divisors, divisor sums, totients, factorials and friends.</summary>
 public static class NumberTheory
 {
-    /// <summary>Greatest common divisor by Euclid's algorithm.</summary>
+    /// <summary>Greatest common divisor by Euclid's algorithm. Always non-negative.</summary>
     public static long Gcd(long a, long b)
     {
         while (b != 0)
@@ -16,24 +16,23 @@ public static class NumberTheory
         return Math.Abs(a);
     }
 
-    /// <summary>Least common multiple.</summary>
-    public static long Lcm(long a, long b) => a / Gcd(a, b) * b;
+    /// <summary>Least common multiple. Always non-negative, and zero when either argument is zero.</summary>
+    public static long Lcm(long a, long b) => a == 0 || b == 0 ? 0 : Math.Abs(a / Gcd(a, b) * b);
 
-    /// <summary>Integer square root: the largest s with s*s ≤ n.</summary>
+    /// <summary>Integer square root: the largest s with s*s ≤ n. Valid for every non-negative long.</summary>
     public static long ISqrt(long n)
     {
-        if (n < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(n));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(n);
 
+        // Math.Sqrt is within one of the answer for 64-bit input; correct it without ever forming a square
+        // that could overflow (s*s ≤ n is the same as s ≤ n/s for positive s).
         var s = (long)Math.Sqrt(n);
-        while (s * s > n)
+        while (s > 0 && s > n / s)
         {
             s--;
         }
 
-        while ((s + 1) * (s + 1) <= n)
+        while (s + 1 <= n / (s + 1))
         {
             s++;
         }
@@ -53,7 +52,10 @@ public static class NumberTheory
         return s * s == n;
     }
 
-    /// <summary>Sum of the proper divisors of n (divisors excluding n itself).</summary>
+    /// <summary>
+    /// Sum of the proper divisors of n (divisors excluding n itself). The sum itself can exceed
+    /// <see cref="long.MaxValue"/> for highly composite n above roughly 10^18.
+    /// </summary>
     public static long ProperDivisorSum(long n)
     {
         if (n < 2)
@@ -62,7 +64,7 @@ public static class NumberTheory
         }
 
         long sum = 1;
-        for (long d = 2; d * d <= n; d++)
+        for (long d = 2; d <= n / d; d++)
         {
             if (n % d != 0)
             {

@@ -65,7 +65,7 @@ public class AnswerTests
         [56] = "972",
         [57] = "153",
         [58] = "26241",
-        [59] = "107359", // Answer for the original cipher.txt; the file was replaced on the site in 2019 (new answer 129448).
+        [59] = "107359", // For 0059_cipher_original.txt; the site replaced the cipher in 2019 (its answer is 129448).
         [60] = "26033",
         [61] = "28684",
         [62] = "127035954683",

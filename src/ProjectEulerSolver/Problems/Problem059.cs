@@ -13,7 +13,7 @@ public sealed class Problem059 : Problem
 
     public override object Solve()
     {
-        var cipher = Resources.ReadText("0059_cipher.txt").Split(',').Select(byte.Parse).ToArray();
+        var cipher = Resources.ReadText("0059_cipher_original.txt").Split(',').Select(byte.Parse).ToArray();
 
         // Each key byte encrypts every third character independently, so pick, per position, the lowercase
         // letter that turns the most bytes into ordinary English text (letters and spaces).

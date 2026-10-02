@@ -53,35 +53,61 @@ public static class Combinatorics
         return true;
     }
 
-    /// <summary>All k-element subsets of <paramref name="items"/>, preserving the original order within each subset.</summary>
+    /// <summary>
+    /// All k-element subsets of <paramref name="items"/> in lexicographic order of positions, preserving the
+    /// original order within each subset. Only the yielded arrays are allocated.
+    /// </summary>
     public static IEnumerable<T[]> Combinations<T>(IReadOnlyList<T> items, int k)
     {
-        if (k == 0)
+        ArgumentOutOfRangeException.ThrowIfNegative(k);
+        if (k > items.Count)
         {
-            yield return [];
             yield break;
         }
 
-        for (var i = 0; i + k <= items.Count; i++)
+        var indices = Enumerable.Range(0, k).ToArray();
+        while (true)
         {
-            var rest = new ArraySegment<T>([.. items], i + 1, items.Count - i - 1);
-            foreach (var tail in Combinations(rest, k - 1))
+            var combination = new T[k];
+            for (var i = 0; i < k; i++)
             {
-                yield return [items[i], .. tail];
+                combination[i] = items[indices[i]];
+            }
+
+            yield return combination;
+
+            // Advance the rightmost index that has room to move, then reset everything after it.
+            var pivot = k - 1;
+            while (pivot >= 0 && indices[pivot] == items.Count - k + pivot)
+            {
+                pivot--;
+            }
+
+            if (pivot < 0)
+            {
+                yield break;
+            }
+
+            indices[pivot]++;
+            for (var i = pivot + 1; i < k; i++)
+            {
+                indices[i] = indices[i - 1] + 1;
             }
         }
     }
 
     /// <summary>
-    /// Number of ways to write <paramref name="total"/> as a sum of the given parts, where order does not matter
-    /// and each part may be used any number of times (the classic coin-change count).
+    /// Number of ways to write <paramref name="total"/> as a sum of the given positive parts, where order does
+    /// not matter and each part may be used any number of times (the classic coin-change count).
     /// </summary>
     public static BigInteger CountPartitions(int total, IEnumerable<int> parts)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(total);
         var ways = new BigInteger[total + 1];
         ways[0] = 1;
         foreach (var part in parts)
         {
+            ArgumentOutOfRangeException.ThrowIfLessThan(part, 1, nameof(parts));
             for (var amount = part; amount <= total; amount++)
             {
                 ways[amount] += ways[amount - part];

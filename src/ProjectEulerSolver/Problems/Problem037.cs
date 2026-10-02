@@ -5,16 +5,18 @@ namespace ProjectEulerSolver.Problems;
 /// <summary>The sum of the only eleven primes that are truncatable from both left and right.</summary>
 public sealed class Problem037 : Problem
 {
+    private const int Limit = 1_000_000;
+
     public override int Number => 37;
 
     public override string Title => "Truncatable Primes";
 
     public override object Solve()
     {
-        var isPrime = Primes.Sieve(1_000_000);
+        var isPrime = Primes.Sieve(Limit);
         long total = 0;
         var found = 0;
-        for (var n = 11; found < 11; n += 2)
+        for (var n = 11; n < Limit && found < 11; n += 2)
         {
             if (isPrime[n] && IsTruncatable(n, isPrime))
             {
@@ -23,7 +25,7 @@ public sealed class Problem037 : Problem
             }
         }
 
-        return total;
+        return found == 11 ? total : throw new InvalidOperationException($"Only {found} truncatable primes below {Limit}.");
     }
 
     private static bool IsTruncatable(int n, bool[] isPrime)

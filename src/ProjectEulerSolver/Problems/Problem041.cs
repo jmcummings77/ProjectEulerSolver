@@ -14,11 +14,9 @@ public sealed class Problem041 : Problem
         // 1..8 and 1..9 pandigitals have digit sums 36 and 45, so they are divisible by 3; start from 7 digits.
         for (var length = 7; length >= 1; length--)
         {
+            // Seeding the digits in descending order makes the permutations come out largest first.
             var digits = Enumerable.Range(1, length).Reverse().ToArray();
-            var candidates = Combinatorics.Permutations(digits)
-                .Select(Digits.FromDigits)
-                .OrderDescending();
-            foreach (var candidate in candidates)
+            foreach (var candidate in Combinatorics.Permutations(digits).Select(Digits.FromDigits))
             {
                 if (Primes.IsPrime(candidate))
                 {

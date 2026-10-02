@@ -13,56 +13,72 @@ public sealed class Problem074 : Problem
 
     public override object Solve()
     {
-        var factorials = Enumerable.Range(0, 10).Select(d => (int)NumberTheory.Factorial(d)).ToArray();
-
-        // Chain lengths are cached for every value seen; 9! * 7 = 2,540,160 bounds every term after the first.
-        var lengths = new int[7 * factorials[9] + 1];
+        var chains = new DigitFactorialChains();
         var count = 0;
         for (var start = 1; start < Limit; start++)
         {
-            if (ChainLength(start) == 60)
+            if (chains.Length(start) == 60)
             {
                 count++;
             }
         }
 
         return count;
+    }
 
-        int ChainLength(int start)
+    /// <summary>Lengths of "sum of the factorials of the digits" chains, cached across calls.</summary>
+    internal sealed class DigitFactorialChains
+    {
+        private static readonly int[] Factorials = Enumerable.Range(0, 10).Select(d => (int)NumberTheory.Factorial(d)).ToArray();
+
+        // 7 × 9! = 2,540,160 bounds every term after the first for starts below ten million, so a flat array works.
+        private readonly int[] lengths = new int[7 * Factorials[9] + 1];
+
+        /// <summary>Number of non-repeating terms in the chain that starts at <paramref name="start"/>.</summary>
+        public int Length(int start)
         {
             var path = new List<int>();
             var current = start;
-            while (true)
+            while (lengths[current] == 0)
             {
-                if (lengths[current] != 0)
-                {
-                    break; // Reached a value whose chain length is already known.
-                }
-
                 var loopIndex = path.IndexOf(current);
                 if (loopIndex >= 0)
                 {
-                    // Everything in the loop has the loop's length; earlier terms count their distance to it.
+                    // A new loop: every term in it has the loop's length. Drop it from the path so the terms
+                    // that led into it are measured as their distance to the loop plus the loop length.
                     var loopLength = path.Count - loopIndex;
                     for (var i = loopIndex; i < path.Count; i++)
                     {
                         lengths[path[i]] = loopLength;
                     }
 
+                    path.RemoveRange(loopIndex, loopLength);
                     break;
                 }
 
                 path.Add(current);
-                current = Digits.Of(current).Sum(d => factorials[d]);
+                current = Next(current);
             }
 
-            var tail = lengths[current];
-            for (var i = path.Count - 1; i >= 0 && lengths[path[i]] == 0; i--)
+            var length = lengths[current];
+            for (var i = path.Count - 1; i >= 0; i--)
             {
-                lengths[path[i]] = ++tail;
+                lengths[path[i]] = ++length;
             }
 
             return lengths[start];
+        }
+
+        /// <summary>The next term: the sum of the factorials of the digits.</summary>
+        public static int Next(int n)
+        {
+            var sum = 0;
+            for (var m = n; m > 0; m /= 10)
+            {
+                sum += Factorials[m % 10];
+            }
+
+            return sum;
         }
     }
 }

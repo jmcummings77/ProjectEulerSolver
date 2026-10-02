@@ -9,5 +9,5 @@ public sealed class Problem067 : Problem
 
     public override string Title => "Maximum Path Sum II";
 
-    public override object Solve() => Problem018.MaximumPathSum(Resources.ReadLines("0067_triangle.txt"));
+    public override object Solve() => NumberTriangle.MaximumPathSum(Resources.ReadLines("0067_triangle.txt"));
 }

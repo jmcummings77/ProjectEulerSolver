@@ -8,8 +8,11 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 4
 
-[*.{json,yml,yaml,props,csproj,sln}]
+[*.{json,yml,yaml,props,csproj}]
 indent_size = 2
+
+[*.sln]
+indent_style = tab
 
 [*.md]
 trim_trailing_whitespace = false

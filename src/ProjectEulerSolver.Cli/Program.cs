@@ -41,7 +41,7 @@ public static class Program
     {
         foreach (var problem in ProblemCatalog.All)
         {
-            Console.WriteLine($"{problem.Number,3}  {problem.Title}");
+            Console.WriteLine($"{problem.Number,3}  {problem.Title,-42} {problem.Url}");
         }
 
         return 0;
@@ -52,7 +52,13 @@ public static class Program
         var selected = new List<Problem>();
         foreach (var argument in arguments)
         {
-            if (!int.TryParse(argument, out var number))
+            if (argument.StartsWith('-'))
+            {
+                Console.Error.WriteLine($"Unknown option '{argument}'. Use --help to see the available options.");
+                return 2;
+            }
+
+            if (!int.TryParse(argument, out var number) || number < 1)
             {
                 Console.Error.WriteLine($"'{argument}' is not a problem number.");
                 return 2;
@@ -73,7 +79,7 @@ public static class Program
 
     private static int Run(IReadOnlyList<Problem> problems)
     {
-        Console.WriteLine($"{"#",3}  {"Title",-42} {"Answer",-20} {"Time",9}");
+        Console.WriteLine($"{"#",3}  {"Title",-42} {"Answer",-20} {"Time",10}");
         var failures = 0;
         var total = Stopwatch.StartNew();
         foreach (var problem in problems)
@@ -84,10 +90,12 @@ public static class Program
                 var answer = problem.Solve();
                 Console.WriteLine($"{problem.Number,3}  {problem.Title,-42} {answer,-20} {stopwatch.Elapsed.TotalMilliseconds,7:N0} ms");
             }
-            catch (Exception exception) when (exception is InvalidOperationException or FileNotFoundException)
+            catch (Exception exception)
             {
+                // A batch run should report every failure and still print the summary, so catch everything here.
                 failures++;
-                Console.WriteLine($"{problem.Number,3}  {problem.Title,-42} FAILED: {exception.Message}");
+                Console.WriteLine($"{problem.Number,3}  {problem.Title,-42} FAILED");
+                Console.Error.WriteLine($"Problem {problem.Number} failed: {exception.GetType().Name}: {exception.Message}");
             }
         }
 

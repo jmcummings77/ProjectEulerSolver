@@ -5,7 +5,6 @@ namespace ProjectEulerSolver.Problems;
 /// <summary>The lowest sum for a set of five primes for which any two concatenate to produce another prime.</summary>
 public sealed class Problem060 : Problem
 {
-    private const int Limit = 10_000;
     private const int SetSize = 5;
 
     public override int Number => 60;
@@ -14,70 +13,93 @@ public sealed class Problem060 : Problem
 
     public override object Solve()
     {
-        // 2 and 5 can never be a member: a concatenation ending in them is even or a multiple of 5.
-        var primes = Primes.UpTo(Limit).Where(p => p != 2 && p != 5).ToArray();
+        // Find a candidate among primes below 10,000, then prove nothing smaller exists: every member of a set
+        // with a smaller sum is below candidate − (3 + 7 + 11 + 13), so a second search over that universe,
+        // pruned by the candidate, is exhaustive. Pair results are shared between the two passes.
+        var pairs = new PrimePairGraph();
+        var candidate = pairs.LowestSum(Primes.UpTo(10_000), long.MaxValue);
+        return pairs.LowestSum(Primes.UpTo((int)candidate - 34), candidate);
+    }
 
-        // Build the compatibility graph, then search for a 5-clique with the smallest total.
-        var neighbours = new List<int>[primes.Length];
-        for (var i = 0; i < primes.Length; i++)
-        {
-            neighbours[i] = [];
-        }
+    /// <summary>
+    /// The "concatenate both ways to primes" relation, computed lazily and memoised, with a pruned depth-first
+    /// search for the five-clique of smallest sum.
+    /// </summary>
+    private sealed class PrimePairGraph
+    {
+        private readonly Dictionary<long, bool> compatibility = [];
 
-        for (var i = 0; i < primes.Length; i++)
+        /// <summary>The smallest sum of a qualifying five-set drawn from <paramref name="allPrimes"/>, or <paramref name="bound"/> when none beats it.</summary>
+        public long LowestSum(int[] allPrimes, long bound)
         {
-            for (var j = i + 1; j < primes.Length; j++)
+            // 2 and 5 can never be members: a concatenation ending in them is even or a multiple of 5.
+            var primes = allPrimes.Where(p => p != 2 && p != 5).ToArray();
+            var members = new int[SetSize];
+            var best = bound;
+
+            Extend(0, 0);
+            return best;
+
+            void Extend(int depth, long sum)
             {
-                if (ArePair(primes[i], primes[j]))
+                if (depth == SetSize)
                 {
-                    neighbours[i].Add(j);
+                    best = sum;
+                    return;
+                }
+
+                // Members are chosen in ascending order, so the remaining ones are each at least primes[i].
+                var remaining = SetSize - depth;
+                var first = depth == 0 ? 0 : members[depth - 1] + 1;
+                for (var i = first; i < primes.Length && sum + remaining * (long)primes[i] < best; i++)
+                {
+                    var compatible = true;
+                    for (var m = 0; m < depth && compatible; m++)
+                    {
+                        compatible = ArePair(primes[members[m]], primes[i]);
+                    }
+
+                    if (compatible)
+                    {
+                        members[depth] = i;
+                        Extend(depth + 1, sum + primes[i]);
+                    }
                 }
             }
         }
 
-        var best = long.MaxValue;
-        var clique = new int[SetSize];
-        for (var i = 0; i < primes.Length; i++)
+        private bool ArePair(long a, long b)
         {
-            clique[0] = i;
-            Extend(1, neighbours[i], primes[i]);
+            var key = a * 1_000_000 + b; // Both primes are far below a million.
+            if (!compatibility.TryGetValue(key, out var result))
+            {
+                result = ConcatenateToPrimes(a, b);
+                compatibility[key] = result;
+            }
+
+            return result;
         }
 
-        return best;
-
-        void Extend(int depth, List<int> candidates, long sum)
+        private static bool ConcatenateToPrimes(long a, long b)
         {
-            if (sum >= best)
+            // Apart from 3 itself, two members must share a residue mod 3, or one concatenation is divisible by 3.
+            if (a != 3 && b != 3 && a % 3 != b % 3)
             {
-                return;
+                return false;
             }
 
-            if (depth == SetSize)
+            return Primes.IsPrime(Concatenate(a, b)) && Primes.IsPrime(Concatenate(b, a));
+        }
+
+        private static long Concatenate(long a, long b)
+        {
+            var shifted = a;
+            for (var m = b; m > 0; m /= 10)
             {
-                best = sum;
-                return;
+                shifted *= 10;
             }
 
-            foreach (var candidate in candidates)
-            {
-                // Only keep candidates adjacent to every member chosen so far.
-                var next = candidates.Where(c => c > candidate && neighbours[candidate].BinarySearch(c) >= 0).ToList();
-                clique[depth] = candidate;
-                Extend(depth + 1, next, sum + primes[candidate]);
-            }
+            return shifted + b;
         }
     }
-
-    private static bool ArePair(long a, long b)
-    {
-        // Apart from 3 itself, two members must share a residue mod 3 or one concatenation is divisible by 3.
-        if (a != 3 && b != 3 && a % 3 != b % 3)
-        {
-            return false;
-        }
-
-        return Primes.IsPrime(Concatenate(a, b)) && Primes.IsPrime(Concatenate(b, a));
-    }
-
-    private static long Concatenate(long a, long b) => a * (long)Math.Pow(10, Digits.Count(b)) + b;
 }

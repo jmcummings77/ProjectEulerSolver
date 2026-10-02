@@ -12,7 +12,7 @@ public sealed class Problem009 : Problem
         const int perimeter = 1000;
         for (var a = 1; a < perimeter / 3; a++)
         {
-            for (var b = a + 1; b < (perimeter - a) / 2; b++)
+            for (var b = a + 1; 2 * b < perimeter - a; b++) // b < c
             {
                 var c = perimeter - a - b;
                 if (a * a + b * b == c * c)

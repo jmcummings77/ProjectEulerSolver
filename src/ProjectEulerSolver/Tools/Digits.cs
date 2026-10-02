@@ -2,49 +2,82 @@ using System.Numerics;
 
 namespace ProjectEulerSolver.Tools;
 
-/// <summary>Helpers for treating integers as sequences of decimal digits.</summary>
+/// <summary>
+/// Helpers for treating integers as sequences of decimal digits. Every member works on the absolute value
+/// of its argument: a minus sign is never a digit. <see cref="Reverse(long)"/> keeps the sign of its input.
+/// </summary>
 public static class Digits
 {
-    /// <summary>Decimal digits of n, most significant first.</summary>
-    public static int[] Of(long n) => Of(n.ToString());
+    /// <summary>Decimal digits of |n|, most significant first.</summary>
+    public static int[] Of(long n)
+    {
+        var magnitude = Magnitude(n);
+        var digits = new int[Count(magnitude)];
+        for (var i = digits.Length - 1; i >= 0; i--)
+        {
+            digits[i] = (int)(magnitude % 10);
+            magnitude /= 10;
+        }
 
-    /// <summary>Decimal digits of n, most significant first.</summary>
-    public static int[] Of(BigInteger n) => Of(BigInteger.Abs(n).ToString());
+        return digits;
+    }
 
-    /// <summary>Sum of the decimal digits of n.</summary>
+    /// <summary>Decimal digits of |n|, most significant first.</summary>
+    public static int[] Of(BigInteger n)
+    {
+        var text = BigInteger.Abs(n).ToString();
+        var digits = new int[text.Length];
+        for (var i = 0; i < text.Length; i++)
+        {
+            digits[i] = text[i] - '0';
+        }
+
+        return digits;
+    }
+
+    /// <summary>Sum of the decimal digits of |n|.</summary>
     public static int Sum(BigInteger n) => Of(n).Sum();
 
-    /// <summary>Sum of the decimal digits of n.</summary>
-    public static int Sum(long n) => Of(n).Sum();
+    /// <summary>Sum of the decimal digits of |n|.</summary>
+    public static int Sum(long n)
+    {
+        var sum = 0;
+        for (var magnitude = Magnitude(n); magnitude > 0; magnitude /= 10)
+        {
+            sum += (int)(magnitude % 10);
+        }
 
-    /// <summary>Number of decimal digits in n.</summary>
-    public static int Count(long n) => Math.Abs(n).ToString().Length;
+        return sum;
+    }
 
-    /// <summary>Number of decimal digits in n.</summary>
+    /// <summary>Number of decimal digits in |n| (1 for zero).</summary>
+    public static int Count(long n) => Count(Magnitude(n));
+
+    /// <summary>Number of decimal digits in |n| (1 for zero).</summary>
     public static int Count(BigInteger n) => BigInteger.Abs(n).ToString().Length;
 
     /// <summary>Builds an integer from digits given most significant first.</summary>
     public static long FromDigits(IEnumerable<int> digits) => digits.Aggregate(0L, (value, digit) => value * 10 + digit);
 
-    /// <summary>n with its decimal digits reversed.</summary>
+    /// <summary>n with the decimal digits of its magnitude reversed; the sign is preserved.</summary>
     public static long Reverse(long n)
     {
         long reversed = 0;
-        while (n > 0)
+        for (var magnitude = Magnitude(n); magnitude > 0; magnitude /= 10)
         {
-            reversed = reversed * 10 + n % 10;
-            n /= 10;
+            reversed = reversed * 10 + (long)(magnitude % 10);
         }
 
-        return reversed;
+        return n < 0 ? -reversed : reversed;
     }
 
-    /// <summary>n with its decimal digits reversed.</summary>
+    /// <summary>n with the decimal digits of its magnitude reversed; the sign is preserved.</summary>
     public static BigInteger Reverse(BigInteger n)
     {
-        var chars = n.ToString().ToCharArray();
+        var chars = BigInteger.Abs(n).ToString().ToCharArray();
         Array.Reverse(chars);
-        return BigInteger.Parse(chars);
+        var reversed = BigInteger.Parse(chars);
+        return n.Sign < 0 ? -reversed : reversed;
     }
 
     /// <summary>True when the string reads the same forwards and backwards.</summary>
@@ -61,11 +94,11 @@ public static class Digits
         return true;
     }
 
-    /// <summary>True when n's decimal representation is a palindrome.</summary>
+    /// <summary>True when n is non-negative and its decimal representation is a palindrome.</summary>
     public static bool IsPalindrome(long n) => n >= 0 && n == Reverse(n);
 
-    /// <summary>True when n's decimal representation is a palindrome.</summary>
-    public static bool IsPalindrome(BigInteger n) => IsPalindrome(n.ToString());
+    /// <summary>True when n is non-negative and its decimal representation is a palindrome.</summary>
+    public static bool IsPalindrome(BigInteger n) => n.Sign >= 0 && IsPalindrome(n.ToString());
 
     /// <summary>True when n uses each digit 1..<paramref name="length"/> exactly once.</summary>
     public static bool IsPandigital(long n, int length)
@@ -91,22 +124,25 @@ public static class Digits
     /// <summary>A canonical key shared by all numbers with the same multiset of digits.</summary>
     public static string SortedKey(BigInteger n)
     {
-        var chars = n.ToString().ToCharArray();
+        var chars = BigInteger.Abs(n).ToString().ToCharArray();
         Array.Sort(chars);
         return new string(chars);
     }
 
-    /// <summary>True when a and b contain exactly the same digits in some order.</summary>
+    /// <summary>True when |a| and |b| contain exactly the same digits in some order.</summary>
     public static bool ArePermutations(long a, long b) => SortedKey(a) == SortedKey(b);
 
-    private static int[] Of(string text)
+    private static ulong Magnitude(long n) => n < 0 ? (ulong)(-(n + 1)) + 1 : (ulong)n;
+
+    private static int Count(ulong magnitude)
     {
-        var digits = new int[text.Length];
-        for (var i = 0; i < text.Length; i++)
+        var count = 1;
+        while (magnitude >= 10)
         {
-            digits[i] = text[i] - '0';
+            magnitude /= 10;
+            count++;
         }
 
-        return digits;
+        return count;
     }
 }

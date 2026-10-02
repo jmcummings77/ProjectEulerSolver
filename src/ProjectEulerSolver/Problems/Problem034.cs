@@ -18,7 +18,13 @@ public sealed class Problem034 : Problem
         var total = 0;
         for (var n = 10; n <= limit; n++)
         {
-            if (Digits.Of(n).Sum(d => factorials[d]) == n)
+            var sum = 0;
+            for (var m = n; m > 0; m /= 10)
+            {
+                sum += factorials[m % 10];
+            }
+
+            if (sum == n)
             {
                 total += n;
             }
